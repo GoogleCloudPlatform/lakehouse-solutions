@@ -139,6 +139,8 @@ Read the blog posts and the lab narrative below, review the code, and then start
 
 <br>
 
+<hr>
+
 ### 1.11. Product direction
 
 Google Cloud is strategically investing in support for Spark Connect. 
