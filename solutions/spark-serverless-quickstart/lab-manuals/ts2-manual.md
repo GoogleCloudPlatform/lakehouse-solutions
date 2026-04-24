@@ -137,6 +137,12 @@ In the lab, we will simulate a data analyst that reads data, transforms it a bit
 
 Read the blog posts and the lab narrative below, review the code, and then start trying out the lab.
 
+<br>
+
+### 1.11. Product direction
+
+Google Cloud is strategically investing in support for Spark Connect. 
+
 <hr>
 <hr>
 
