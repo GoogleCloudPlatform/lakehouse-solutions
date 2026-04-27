@@ -20,7 +20,7 @@ limitations under the License.*
 ## 1.0. About the lab
 
 ### 1.1. Abstract
-This lab is **introductory** in nature and showcases running Apache Spark applications on Google Cloud Platform with Airflow orchestration on managed products/services - **Serverless Managed service for Apache Spark** and **Managed service for Apache Airflow** with a minimum viable example. The goal of the lab is to demystify **Serverless Managed service for Apache Spark** through a (zero fluff, zero dazzle) minimum viable end to end sample to accelerate adoption. This hands-on lab complements the blog post [Lakehouse Demystified - Part 2: Just enough about Serverless Managed Service for Apache Spark]().
+This lab is **introductory** in nature and showcases running Apache Spark applications on Google Cloud Platform on the managed product - **Serverless Managed Service for Apache Spark** with a minimum viable example. The goal of the lab is to demystify **Serverless Managed service for Apache Spark** through a (zero fluff, zero dazzle) minimum viable end to end sample to accelerate adoption. This hands-on lab complements the blog post [Lakehouse Demystified - Part 2: Just enough about Serverless Managed Service for Apache Spark](https://medium.com/p/6ac3e5051794).
 
 
 |  |  | 
@@ -31,11 +31,10 @@ This lab is **introductory** in nature and showcases running Apache Spark applic
 | Process | Rule-based, thresholds-based anomaly detection |
 | Dataset | Kaggle Telco Customer Churn Public (small) Dataset |
 | Data Engineering Product | Apache Spark on Serverless Managed Service for Apache Spark |
-| Scheduling and Orchestration Product | Apache Airflow on Serverless Managed Service for Apache Airflow|
 
 
 #### What to expect:
-In this lab, you will provision Google Cloud products/services required for running Apache Spark workloads. You will then run four minimum viable Spark jobs that can be chained into a pipeline, and learn to view execution in the Spark console of the service. You finally run the same four Spark jobs as part of an Airflow DAG on Managed Service for Apache Airflow, and view the execution in the Airflow service console. We will not delve into Managed Service for Apache Airflow in this lab, this service will be covered in a separate blog post and hands-on lab.
+In this lab, you will provision Google Cloud products/services required for running Apache Spark workloads. You will then run four minimum viable and related Spark jobs and learn to view execution in the Spark console of the service. We will not delve into pipelines on the Managed Service for Apache Airflow in this lab, even though the code exists in this hands-on lab. This service will be covered in a separate blog post & hands-on lab.
 
 <hr>
 
@@ -49,7 +48,7 @@ In this lab, you will provision Google Cloud products/services required for runn
 
 
 ### 1.3. Duration
-The hands-on lab takes ~1.5 hours to complete
+The hands-on lab takes ~1 hour or less to complete
 
 <hr>
 
@@ -78,7 +77,6 @@ Covered in sections 3.3 and 3.4
 | -- | :--- | 
 | Provisioning Automation | Terraform for enabling Google APIs, service account creation, IAM permissions, organizational policy updates, network and firewall rules creation, storage buckets creation, file uploads to buckets, provisioning of Managed Airflow 3.0 environment |
 | Data Engineering |  Submitting Serverless Managed Service for Apache Spark  **batches**, viewing the execution on the Cloud Console |
-| Scheduling and Orchestration | Executing an Apache Airflow DAG on Serverless Managed Service for Apache Airflow |
 
 
 <hr>
@@ -87,7 +85,7 @@ Covered in sections 3.3 and 3.4
 
 #### 1.8.1. Reference Architecture
 
-Please refer to the [Lakehouse Demystified - Part 2: Just enough about Serverless Managed Service for Apache Spark]() blog post for an explanation.
+Please refer to the [Lakehouse Demystified - Part 2: Just enough about Serverless Managed Service for Apache Spark](https://medium.com/p/6ac3e5051794) blog post for an explanation.
 
 ![README](../images/s8s-qs-04a.png)   
 <br><br>
@@ -129,20 +127,14 @@ Please refer to the [Lakehouse Demystified - Part 2: Just enough about Serverles
 
 <hr>
 
-### 1.13. The data engineering pipeline orchestration on Serverless Managed Service for Apache Airflow
 
-![README](../images/s8s-qs-17b.png)   
-<br><br>
-
-<hr>
-
-### 1.14. For success
+### 1.13. For success
 
 Read the lab - narrative below, review the code, and then start trying out the lab.
 
 <hr>
 
-### 1.15. Credits
+### 1.14. Credits
 
 The code in this lab was originally developed by Tek Systems for Google Cloud.
 
@@ -151,19 +143,12 @@ The code in this lab was originally developed by Tek Systems for Google Cloud.
 # 2. Product Highlights
 
 
-## 2.1. Serverless Managed Service for Apache Spark
+## Serverless Managed Service for Apache Spark
 
-This hands-on lab complements the blog post [Lakehouse Demystified - Part 2: Just enough about Serverless Managed Service for Apache Spark]() blog post for an explanation. Reading the blog is recommended for full understanding of the product. 
-
-<hr>
-
-## 2.2. Serverless Managed Service for Apache Airflow
-
-This hands-on lab complements the blog post [Lakehouse Demystified — Part 5: Lakehouse orchestration with Managed service for Apache Airflow]() blog post for an explanation. Reading the blog is recommended for full understanding of the product. 
-
-
+This hands-on lab complements the blog post [Lakehouse Demystified - Part 2: Just enough about Serverless Managed Service for Apache Spark](https://medium.com/p/6ac3e5051794) blog post for an explanation. Reading the blog is recommended for full understanding of the product. 
 
 <hr>
+
 
 # 3. Lab
 
@@ -172,7 +157,7 @@ This hands-on lab complements the blog post [Lakehouse Demystified — Part 5: L
 ## 3.1. Clone this repo in Cloud Shell
 
 ```
-git clone https://github.com/anagha-google/lakehouse-solutions-build.git
+git clone git@github.com:GoogleCloudPlatform/lakehouse-solutions.git
 ```
 
 <hr>
@@ -643,7 +628,6 @@ This script -<br>
 
 <br>
 
-
 <hr>
 
 
@@ -1058,6 +1042,7 @@ gs://$CODE_AND_DATA_BUCKET/scripts/pyspark/kpis_by_cell_tower.py \
 <br>
 
 
+
 <hr>
 
 #### 6.4.4. Take a quick read of the console output that is just FYI
@@ -1208,69 +1193,10 @@ select CellName, Maintainence_Required from `cell_tower_reporting_mart.kpis_by_c
 
 <hr>
 
-## 7.0. Automate orchestration with Apache Airflow powered by Managed Airflow Serverless
 
-### 7.1. The data engineering pipeline
 
-![README](../images/s8s-qs-17a.png)   
-<br><br>
 
 <hr>
-
-### 7.2. Architecture
-
-![README](../images/s8s-qs-17b.png)   
-<br><br>
-
-<hr>
-
-
-### 7.3. Review the Airflow DAG code
-
-Review the code to understand the DAG construct, variables and how serverless Spark jobs are invoked.
-[Code](provisioning-automation/core-tf/scripts/composer-dag/pipeline.py)
-
-<br>
-
-<hr>
-
-### 7.4. Review the Airflow environment and Terraform imported Airflow variables in the Managed Airflow service UI
-
-Familiarize yourself with the UI of Managed Airflow service. And then navigate to the "Environment Variables" tab and review the variables supplied at provision time that get used in the DAG at runtime.
-
- ![README](../images/s8s-qs-09.png)   
-<br><br>
-
-
-<br>
-
-<hr>
-
-### 7.5. Open the Airflow UI from the Managed Airflow service UI on Cloud Console
-Familaize yourself with the UI if new to Airflow
-
- ![README](../images/s8s-qs-10.png)   
-<br><br>
-
-<hr>
-
-### 7.6. Run the DAG for Cell Tower Anomaly Detection
-
- ![README](../images/s8s-qs-11.png)   
-<br><br>
-
-<hr>
-
-### 7.7. Review the job execution in the Managed Service for Apache Spark "Batches" UI
-
-![README](../images/s8s-qs-15.png)   
-<br><br>
-
-<br>
-
-<hr>
-
-
 
 ##### =====================================================================================================
 ##### THIS CONCLUDES THE LAB - CELL TOWER ANOMALY DETECTION ON MANAGED SPARK SERVERLESS
