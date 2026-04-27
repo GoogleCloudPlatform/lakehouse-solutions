@@ -481,6 +481,20 @@ To customize the session further, refer [docs](https://docs.cloud.google.com/big
 <br><br>
 
 The BigQuery Spark connector was used to query Bigquery. This concludes the tutorial for Spark in Colab notebook.
+
+8. Spark session configuration based off the session template can be added to the notebook via the Colab UI as shown below.
+
+![README](../images/ts2-12p.png)   
+<br><br>
+
+![README](../images/ts2-12q.png)   
+<br><br>
+
+![README](../images/ts2-12r.png)   
+<br><br>
+
+![README](../images/ts2-12s.png)   
+<br><br>
    
 <hr>
 <hr>
