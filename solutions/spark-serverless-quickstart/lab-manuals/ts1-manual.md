@@ -55,7 +55,7 @@ The hands-on lab takes ~1 hour or less to complete
 ### 1.4. Prerequisites
 
 - A pre-created project
-- You need to have organization admin rights, project owner privileges or work with privileged users to complete provisioning.
+- You *may* need to have organization admin rights or someone who can alter policies for you, project owner privileges or work with privileged users to complete provisioning.
 
 <hr>
 
