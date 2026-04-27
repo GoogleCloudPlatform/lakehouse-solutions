@@ -34,7 +34,7 @@ This lab is **introductory** in nature and showcases running Apache Spark applic
 
 
 #### What to expect:
-In this lab, you will provision Google Cloud products/services required for running Apache Spark workloads. You will then run four minimum viable and related Spark jobs and learn to view execution in the Spark console of the service. We will not delve into pipelines on the Managed Service for Apache Airflow in this lab, even though the code exists in this hands-on lab. This service will be covered in a separate blog post & hands-on lab.
+In this lab, you will provision Google Cloud products/services required for running Apache Spark workloads. You will then run four minimum viable and related Spark jobs and learn to view execution in the Spark console of the service. We will not delve into pipelines on the Managed Service for Apache Airflow in this lab, even though the code & configuration is included. This service will be covered in a separate blog post & hands-on lab.
 
 <hr>
 
