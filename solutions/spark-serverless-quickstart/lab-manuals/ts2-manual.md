@@ -483,7 +483,13 @@ To customize the session further, refer [docs](https://docs.cloud.google.com/big
 
 The BigQuery Spark connector was used to query Bigquery. This concludes the tutorial for Spark in Colab notebook.
 
-8. Spark session configuration based off the session template can be added to the notebook via the Colab UI as shown below.
+8. The session monitoring tile is in the UI
+
+![README](../images/ts2-12t.png)   
+<br><br>   
+
+
+9. Spark session configuration based off the session template can be added to the notebook via the Colab UI as shown below.
 
 ![README](../images/ts2-12p.png)   
 <br><br>
@@ -500,7 +506,7 @@ The BigQuery Spark connector was used to query Bigquery. This concludes the tuto
 <hr>
 <hr>
 
-## 4.2. Execute a Spark notebook on Gemini Agent Platform Workbench 
+## 4.2. Execute a Spark notebook on Gemini Enterprise Agent Workbench 
 In section [3.4](./ts2-manual.md#34-setup---provision-gemini-enterprise-workbench-instance), we created a workbench instance. Lets upload the crimes notebook [here](../notebooks/chicago-crimes-analytics-jupyter.ipynb) and execute it, this time with Jupyter kernel.<br>
 Note: File-Open from URL option does not work. Please download the notebook [here](../notebooks/chicago-crimes-analytics-jupyter.ipynb) to local, we will upload from local.
 
