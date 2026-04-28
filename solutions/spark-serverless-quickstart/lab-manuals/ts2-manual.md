@@ -223,7 +223,7 @@ Follow the screenshots below to navigate to the Managed Service for Apache Spark
 
 ### 3.2.3. Create the session template
 
-Follow the screenshots below to create a session template. Ensure you make the same selections.
+Follow the screenshots below to create a session template. Ensure you make the same selections. For your reference there is [gcloud](https://docs.cloud.google.com/sdk/gcloud/reference/beta/dataproc/session-templates) as well as [terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dataproc_session_template) support for session template creation.
 
 ![README](../images/ts2-08a.png)   
 <br><br>
@@ -261,7 +261,8 @@ Follow the screenshots below to create a session template. Ensure you make the s
 ## 3.3. Setup - create an interactive sessions template for Jupyter, for PySpark and using a Service Account 
 
 
-Follow the screenshots below to create a session template. Ensure you make the same selections.
+Follow the screenshots below to create a session template. Ensure you make the same selections. Once again, for your reference there is [gcloud](https://docs.cloud.google.com/sdk/gcloud/reference/beta/dataproc/session-templates) as well as [terraform](https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/dataproc_session_template) support for session template creation.
+
 
 ![README](../images/ts2-09a.png)   
 <br><br>
