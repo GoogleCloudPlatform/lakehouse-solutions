@@ -189,7 +189,7 @@ The Terraform in this section updates organization policies and enables Google A
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 
-cd ~/lakehouse-solutions-build/solutions/spark-serverless-quickstart/provisioning-automation/foundations-tf
+cd ~/lakehouse-solutions-build/solutions/spark-serverless-features/provisioning-automation/foundations-tf
 ```
 
 2. Run the Terraform for organization policy edits and enabling Google APIs
@@ -197,13 +197,13 @@ cd ~/lakehouse-solutions-build/solutions/spark-serverless-quickstart/provisionin
 terraform init
 terraform apply \
   -var="project_id=${PROJECT_ID}" \
-  -auto-approve >> s8s-foundations-tf.output
+  -auto-approve >> spark-serverless-features-tf-foundations.output
 ```
 
 Wait till the provisioning completes - ~5 minutes. In a separate cloud shell tab, you can tail the output file for execution state through completion-
 
 ```
-tail -f  ~/lakehouse-solutions-build/solutions/spark-serverless-quickstart/provisioning-automation/foundations-tf/s8s-foundations-tf.output
+tail -f  ~/lakehouse-solutions-build/solutions/spark-serverless-features/provisioning-automation/foundations-tf/spark-serverless-features-tf-foundations.output
 ```
 
 <hr>
@@ -216,12 +216,9 @@ In this section, we will provision-
 1. Network, subnet, firewall rule
 2. Storage buckets for code, datasets, and for use with the services
 3. BigQuery dataset
-4. Serverless Managed Service for Apache Airflow 
-5. User Managed Service Account (UMSA)
-6. Requisite IAM permissions for the UMSA and yourself* 
-7. Copy of code, data, etc into buckets
-8. Import of Airflow DAG
-9. Configuration of Airflow variables
+4. User Managed Service Account (UMSA)
+5. Requisite IAM permissions for the UMSA and yourself* 
+6. Copy of code, data, etc into buckets
 
 *IAM permissions for yourself in case you want to go the console route instead of the programmatic route.
 
@@ -231,7 +228,7 @@ In this section, we will provision-
 ### 3.4.2. Run the terraform scripts
 Paste this in Cloud Shell after editing the GCP region variable to match your nearest region-
 ```
-cd ~/lakehouse-solutions-build/solutions/managed-spark-solutions/provisioning-automation/core-tf/terraform
+cd ~/lakehouse-solutions-build/solutions/spark-serverless-features/provisioning-automation/core-tf/terraform
 
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
@@ -240,7 +237,6 @@ GCP_ACCOUNT_NAME=`gcloud auth list --filter=status:ACTIVE --format="value(accoun
 GCP_REGION="us-central1"
 DEPLOYER_ACCOUNT_NAME=$GCP_ACCOUNT_NAME
 ORG_ID=`gcloud organizations list --format="value(name)"`
-CC3_IMAGE_VERSION="composer-3-airflow-2.10.5-build.29"
 S8S_SPARK_RUNTIME_VERSION="2.3"
 
 ```
@@ -256,16 +252,15 @@ terraform apply \
   -var="deployment_service_account_name=${DEPLOYER_ACCOUNT_NAME}" \
   -var="org_id=${ORG_ID}" \
   -var="spark_runtime_version=${S8S_SPARK_RUNTIME_VERSION}" \
-  -var="cloud_composer_image_version=${CC3_IMAGE_VERSION}" \
   -var="gcp_region=${GCP_REGION}" \
-  -auto-approve >> s8s-core-tf.output
+  -auto-approve >> spark-serverless-features-tf-core.output
   
 ```
 
 Takes ~50 minutes to complete. In a separate cloud shell tab, you can tail the output file for execution state through completion-
 
 ```
-tail -f ~/lakehouse-solutions-build/solutions/managed-spark-solutions/provisioning-automation/core-tf/terraform/managed-spark-solutions-core-tf.output
+tail -f ~/lakehouse-solutions-build/solutions/spark-serverless-features/provisioning-automation/core-tf/terraform/spark-serverless-features-tf-core.output
 ```
 
 <br>
