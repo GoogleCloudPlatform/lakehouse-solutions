@@ -21,7 +21,6 @@ limitations under the License.*
 
 ### 1.1. Abstract
 This lab is **introductory** in nature and showcases running Apache Spark applications on Google Cloud Platform on the managed product - **Serverless Managed Service for Apache Spark**, with the serverless managed **Lakehouse runtime catalog** as the lakehouse metastore for **Iceberg catalog** and **Hive catalog**. The goal of the lab is to demystify **Lakehouse runtime catalog** through a (zero fluff, zero dazzle) minimum viable end to end example of frozen yogurt (froyo) retail sales analysis to accelerate adoption. This hands-on lab complements the blog post [Lakehouse Demystified - Part 4: Just enough about Lakehouse runtime catalog](TODO).
-This lab will also introduce you to creating and using Iceberg and Hive catalogs with the Lakehouse Runtime Catalog service.
 
 |  |  | 
 | -- | :--- | 
