@@ -442,7 +442,7 @@ resource "google_storage_bucket_object" "files_upload_to_gcs" {
 resource "google_bigquery_dataset" "bq_dataset_creation" {
   project                     = local.project_id
   dataset_id                  = local.bq_dataset
-  location                    = "US"
+  location                    = local.location
 }
 
 /******************************************
