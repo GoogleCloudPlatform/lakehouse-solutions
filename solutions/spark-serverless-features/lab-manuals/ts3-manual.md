@@ -181,7 +181,7 @@ gcloud auth application-default set-quota-project <YOUR_PROJECT_ID>
 
 <hr>
 
-## 3.3. Foundational provisioning automation with Terraform
+## 3.3. Provisioning automation of foundational services with Terraform 
 
 The Terraform in this section updates organization policies and enables Google APIs. The organization policy updates are needed for the Google Argolis environment but may not be needed in your environment - check with your administrator. If not needed, remove the section for organization policy updates.
 
@@ -208,7 +208,7 @@ tail -f  ~/lakehouse-solutions-build/solutions/spark-serverless-features/provisi
 
 <hr>
 
-## 3.4. Provisioning automation with Terraform of compute and data services
+## 3.4. Provisioning automation of compute and data services with Terraform
 
 ### 3.4.1. Resources provisioned
 In this section, we will provision-
