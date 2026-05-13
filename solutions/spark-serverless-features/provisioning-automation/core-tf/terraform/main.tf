@@ -380,10 +380,12 @@ resource "null_resource" "unzip_datasets" {
       set -e
       TMP_DIR=$(mktemp -d)
       mkdir -p $TMP_DIR/datasets
+      mkdir -p $TMP_DIR/froyo_recipe_pdfs
       echo "{\"tmp_dir\": \"$TMP_DIR\"}" > unzip_info.json
-      find ../datasets -name '*.zip' -exec unzip -o {} -d $TMP_DIR/datasets \;
-      find ../datasets -name '*.tgz' -exec tar -xzf {} -C $TMP_DIR/datasets \;
-      find ../datasets -maxdepth 1 -type f ! -name '*.zip' ! -name '*.tgz' -exec cp {} $TMP_DIR/datasets/ \;
+      find ../datasets -name '*.zip' -exec unzip -o {} -d $TMP_DIR/datasets/ \;
+      find ../datasets -name '*.tgz' ! -name 'froyo_recipe_pdfs-*.tgz' -exec tar -xzf {} -C $TMP_DIR/datasets/ \;
+      find ../datasets -maxdepth 1 -type f ! -name '*.zip' ! -name '*.tgz' ! -name 'froyo_recipe_pdfs-*.tgz' -exec cp {} $TMP_DIR/datasets/ \;
+      find ../datasets -name 'froyo_recipe_pdfs-*.tgz' -exec tar -xzf {} -C $TMP_DIR/froyo_recipe_pdfs/ \;
 EOT
   }
 
@@ -407,6 +409,17 @@ resource "google_storage_bucket_object" "files_upload_to_gcs" {
   source = "${jsondecode(file("unzip_info.json")).tmp_dir}/datasets/${each.value}"
   name = "datasets/${each.value}"
   bucket = "${local.data_and_code_bucket}"
+  depends_on = [
+    null_resource.unzip_datasets,
+    time_sleep.sleep_after_bucket_creation
+  ]
+}
+
+resource "google_storage_bucket_object" "froyo_pdfs_upload_to_gcs" {
+  for_each = fileset("${jsondecode(file("unzip_info.json")).tmp_dir}/froyo_recipe_pdfs", "**/*")
+  source   = "${jsondecode(file("unzip_info.json")).tmp_dir}/froyo_recipe_pdfs/${each.value}"
+  name     = "datasets/froyo_recipe_pdfs/${each.value}"
+  bucket   = local.data_and_code_bucket
   depends_on = [
     null_resource.unzip_datasets,
     time_sleep.sleep_after_bucket_creation
