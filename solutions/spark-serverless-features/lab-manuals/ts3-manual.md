@@ -35,7 +35,7 @@ This lab will also introduce you to creating and using Iceberg and Hive catalogs
 
 #### What to expect:
 
-In this lab, you will provision the foundational Google Cloud services for the lab, and then create Iceberg and Hive catalogs in the Lakehouse runtime catalog service. You will then use Spark to read, transform, and analyze the Froyo sales data, registering the structured data as tables in these lakehouse catalogs.
+In this lab, you will provision the foundational Google Cloud services for the lab and create Iceberg and Hive catalogs in the Lakehouse runtime catalog service. You will then use Spark to read, transform, and analyze the froyo sales data, registering the structured data as tables in these lakehouse catalogs.
 
 <hr>
 
@@ -77,8 +77,8 @@ Covered in sections 3.3 and 3.4
 | Functionality | Feature | 
 | -- | :--- | 
 | Provisioning Automation | Terraform for enabling Google APIs, service account creation, IAM permissions, organizational policy updates, network and firewall rules creation, storage buckets creation, file uploads to buckets |
-| Data analysis |  Spark notebooks on Colab in BigQuery Studio |
-|  Metastore|  Lakehouse Iceberg catalog for Iceberg and Hive - creation, and operational readiness |
+| Data engineering & analysis |  Spark notebooks on Colab in BigQuery Studio |
+|  Metastore |  Lakehouse Iceberg catalog for Iceberg and Hive - create and use |
 
 <hr>
 
