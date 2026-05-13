@@ -24,13 +24,13 @@ This lab is **introductory** in nature and showcases running Apache Spark applic
 
 |  |  | 
 | -- | :--- | 
-| Technical Focus| **Data Engineering at scale on Google Cloud with Apache Spark** |
+| Technical Focus| **Lakehouse runtime catalog for Iceberg and Hive** |
 | Use case |  Frozen yogurt Sales Analysis |
 | Domain |  Retail |
 | Process | Data curation and analysis |
-| Dataset | Froyo Sales Data in Cloud Storage |
+| Dataset | Froyo sales - synthetically generated |
 | Lakehouse compute engine | Apache Spark on Serverless Managed Service for Apache Spark|
-| Lakehouse metastore | Lakehouse runtime catalogs (Iceberg & Hive) |
+
 
 #### What to expect:
 
@@ -60,7 +60,7 @@ The hands-on lab takes ~1 hour or less to complete
 <hr>
 
 ### 1.5. Resources provisioned
-Covered in sections 3.3 and 3.4
+Covered in subsequent sections - 3.3 and 3.4. 
 
 <hr>
 
@@ -214,8 +214,10 @@ In this section, we will provision-
 6. Copy of code, data, etc into buckets
 7. Iceberg catalog in Lakehouse runtime catalog service
 8. Hive catalog in Lakehouse runtime catalog service
+9. Managed Service for Apache Airflow** 
 
-*IAM permissions for yourself in case you want to go the console route instead of the programmatic route.
+*IAM permissions for yourself in case you want to go the console route instead of the programmatic route.<br>
+**Aiflow environment has been set up for the next solution that features data engineering pipeline on Managed Service for Apache Airflow
 
 <hr>
 
