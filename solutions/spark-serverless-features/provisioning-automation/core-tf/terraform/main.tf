@@ -19,8 +19,9 @@ Local variables declaration
  *****************************************/
 
 locals {
-solution_prefix                     = "spark-froyo-lab"
+solution_prefix                     = "froyo-lab"
 project_id                          = "${var.project_id}"
+project_name                        = "${var.project_id}"
 project_nbr                         = "${var.project_number}"
 admin_upn_fqn                       = "${var.gcp_account_name}"
 location                            = "${var.gcp_region}"
@@ -29,19 +30,17 @@ umsa_fqn                            = "${local.umsa}@${local.project_id}.iam.gse
 spark_bucket                        = "${local.solution_prefix}-spark-bucket-${local.project_nbr}"
 spark_bucket_fqn                    = "gs://{local.spark_bucket}-${local.project_nbr}"
 vpc_nm                              = "${local.solution_prefix}-vpc-${local.project_nbr}"
-spark_subnet_nm                     = "spark-snet"
+spark_subnet_nm                     = "spark-froyo-snet"
 spark_subnet_cidr                   = "10.2.0.0/16"
-data_and_code_bucket                = "${local.solution_prefix}-data_and_code_bucket-${local.project_nbr}"
 bq_dataset                          = "froyo_ds"
 CC_GMSA_FQN                         = "service-${local.project_nbr}@cloudcomposer-accounts.iam.gserviceaccount.com"
 GCE_GMSA_FQN                        = "${local.project_nbr}-compute@developer.gserviceaccount.com"
 CLOUD_COMPOSER3_IMG_VERSION         = "${var.cloud_composer_image_version}"
 S8S_SPARK_RUNTIME_VERSION           = "${var.spark_runtime_version}"
-lakehouse_iceberg_warehouse_bucket  = "froyo-lakehouse-iceberg-${local.project_nbr}"
-lakehouse_hive_warehouse_bucket     = "froyo-lakehouse-hive-${local.project_nbr}"
-lakehouse_stage_bucket              = "froyo-lakehouse-hive-${local.project_nbr}"
-lakehouse_hive_catalog_name         = "froyo_hive_catalog"
-lakehouse_iceberg_catalog_name      = "froyo_iceberg_catalog"
+lakehouse_staging_bucket            = "froyo-lakehouse-staging-${local.project_nbr}"
+lakehouse_hive_catalog_name         = "froyo_hive_lakehouse_catalog_${local.project_nbr}"
+lakehouse_iceberg_catalog_name      = "froyo_iceberg_lakehouse_catalog_${local.project_nbr}"
+lakehouse_code_bucket               = "${local.solution_prefix}-code-bucket-${local.project_nbr}"
 }
 
 /******************************************
@@ -282,37 +281,40 @@ resource "google_storage_bucket" "spark_bucket_creation" {
 }
 
 
-resource "google_storage_bucket" "data_and_code_bucket_creation" {
-  name                              = local.data_and_code_bucket
+resource "google_storage_bucket" "lakehouse_staging_bucket_creation" {
+  name                              = local.lakehouse_staging_bucket
   project                           = local.project_id
   location                          = local.location
   uniform_bucket_level_access       = true
   force_destroy                     = true
-  depends_on = [
-      time_sleep.sleep_after_network_and_firewall_creation
-  ]
+  
 }
 
-resource "google_storage_bucket" "iceberg_warehouse_bucket_creation" {
-  name                          = local.lakehouse_iceberg_warehouse_bucket
-  project                       = local.project_id
-  location                      = local.location
-  uniform_bucket_level_access   = true
-  force_destroy                 = true
-  depends_on = [
-    time_sleep.sleep_after_network_and_firewall_creation
-  ]
+resource "google_storage_bucket" "lakehouse_code_bucket_creation" {
+  name                              = local.lakehouse_code_bucket
+  project                           = local.project_id
+  location                          = local.location
+  uniform_bucket_level_access       = true
+  force_destroy                     = true
+  
 }
 
-resource "google_storage_bucket" "hive_warehouse_bucket_creation" {
-  name                          = local.lakehouse_hive_warehouse_bucket
-  project                       = local.project_id
-  location                      = local.location
-  uniform_bucket_level_access   = true
-  force_destroy                 = true
-  depends_on = [
-    time_sleep.sleep_after_network_and_firewall_creation
-  ]
+resource "google_storage_bucket" "lakehouse_iceberg_catalog_bucket_creation" {
+  name                              = local.lakehouse_iceberg_catalog_name
+  project                           = local.project_id
+  location                          = local.location
+  uniform_bucket_level_access       = true
+  force_destroy                     = true
+  
+}
+
+resource "google_storage_bucket" "lakehouse_hive_catalog_bucket_creation" {
+  name                              = local.lakehouse_hive_catalog_name
+  project                           = local.project_id
+  location                          = local.location
+  uniform_bucket_level_access       = true
+  force_destroy                     = true
+  
 }
 
 /*******************************************
@@ -322,125 +324,116 @@ dependencies having not completed
 resource "time_sleep" "sleep_after_bucket_creation" {
   create_duration = "60s"
   depends_on = [
-    google_storage_bucket.data_and_code_bucket_creation,
+    google_storage_bucket.lakehouse_code_bucket_creation,
     google_storage_bucket.spark_bucket_creation,
-    google_storage_bucket.iceberg_warehouse_bucket_creation,
-    google_storage_bucket.hive_warehouse_bucket_creation
+    google_storage_bucket.lakehouse_staging_bucket_creation,
+    google_storage_bucket.lakehouse_iceberg_catalog_bucket_creation,
+    google_storage_bucket.lakehouse_hive_catalog_bucket_creation
   ]
 }
 
 /******************************************
-8a. Copy the Pyspark scripts to data_and_code_bucket
+8a. Copy the Pyspark scripts to lakehouse_code_bucket
  *****************************************/
 
 resource "google_storage_bucket_object" "pyspark_scripts_upload_to_gcs" {
-  for_each = fileset("../scripts/pyspark/", "*")
+  for_each = fileset("../scripts/pyspark/", "**/*")
   source = "../scripts/pyspark/${each.value}"
   name = "scripts/pyspark/${each.value}"
-  bucket = "${local.data_and_code_bucket}"
+  bucket = "${local.lakehouse_code_bucket}"
   depends_on = [
     time_sleep.sleep_after_bucket_creation
   ]
 }
 
 /******************************************
-8b. Copy the notebooks scripts to data_and_code_bucket
+8b. Copy the notebooks scripts to lakehouse_code_bucket
  *****************************************/
 
 resource "google_storage_bucket_object" "notebooks_upload_to_gcs" {
-  for_each = fileset("../notebooks/", "*")
+  for_each = fileset("../notebooks/", "**/*")
   source = "../notebooks/${each.value}"
   name = "notebooks/${each.value}"
-  bucket = "${local.data_and_code_bucket}"
+  bucket = "${local.lakehouse_code_bucket}"
   depends_on = [
     time_sleep.sleep_after_bucket_creation
   ]
 }
 
 /******************************************
-8c. Copy the Airflow DAG scripts to data_and_code_bucket
+8c. Copy the Airflow DAG scripts to lakehouse_code_bucket
  *****************************************/
 
 resource "google_storage_bucket_object" "airflow_dag_upload_to_gcs" {
   name   = "scripts/airflow-dag/pipeline.py"
   source = "../scripts/airflow-dag/pipeline.py"
-  bucket = "${local.data_and_code_bucket}"
+  bucket = "${local.lakehouse_code_bucket}"
   depends_on = [
     time_sleep.sleep_after_bucket_creation
   ]
 }
 
 /******************************************
-8d. Copy the data to data_and_code_bucket
+8d. Copy the data to lakehouse_staging_bucket
  *****************************************/
 
-resource "null_resource" "unzip_datasets" {
-  provisioner "local-exec" {
-    command = <<EOT
+locals {
+  unzip_and_upload_command = <<EOT
       set -e
-      TMP_DIR=$(mktemp -d)
-      mkdir -p $TMP_DIR/datasets
-      mkdir -p $TMP_DIR/froyo_recipe_pdfs
-      echo "{\"tmp_dir\": \"$TMP_DIR\"}" > unzip_info.json
-      find ../datasets -name '*.zip' -exec unzip -o {} -d $TMP_DIR/datasets/ \;
-      find ../datasets -name '*.tgz' ! -name 'froyo_recipe_pdfs-*.tgz' -exec tar -xzf {} -C $TMP_DIR/datasets/ \;
-      find ../datasets -maxdepth 1 -type f ! -name '*.zip' ! -name '*.tgz' ! -name 'froyo_recipe_pdfs-*.tgz' -exec cp {} $TMP_DIR/datasets/ \;
-      find ../datasets -name 'froyo_recipe_pdfs-*.tgz' -exec tar -xzf {} -C $TMP_DIR/froyo_recipe_pdfs/ \;
-EOT
-  }
+      TMP_DIR_BASE=$(mktemp -d)
 
+      # Process froyo_data.tgz
+      TMP_FROYO_DATA_DIR="$TMP_DIR_BASE/froyo-data"
+      mkdir -p "$TMP_FROYO_DATA_DIR"
+      tar -xzf ../datasets/froyo_data.tgz --strip-components=1 -C "$TMP_FROYO_DATA_DIR"
+
+      # Process froyo_recipe_pdfs-1.tgz and froyo_recipe_pdfs-2.tgz
+      TMP_FROYO_RECIPES_PDFS_DIR="$TMP_DIR_BASE/froyo-recipes-pdfs"
+      mkdir -p "$TMP_FROYO_RECIPES_PDFS_DIR"
+      tar -xzf ../datasets/froyo_recipe_pdfs-1.tgz --strip-components=1 -C "$TMP_FROYO_RECIPES_PDFS_DIR"
+      tar -xzf ../datasets/froyo_recipe_pdfs-2.tgz --strip-components=1 -C "$TMP_FROYO_RECIPES_PDFS_DIR"
+
+      # Process froyo_recipe_ingredient_pdfs.tgz
+      TMP_FROYO_INGREDIENTS_PDFS_DIR="$TMP_DIR_BASE/froyo-recipe-ingredients-pdfs"
+      mkdir -p "$TMP_FROYO_INGREDIENTS_PDFS_DIR"
+      tar -xzf ../datasets/froyo_recipe_ingredient_pdfs.tgz --strip-components=1 -C "$TMP_FROYO_INGREDIENTS_PDFS_DIR"
+
+      # Remove .DS_Store files before upload
+      find "$TMP_DIR_BASE" -name ".DS_Store" -delete
+
+      # Upload to GCS
+      gsutil -m cp -r "$TMP_FROYO_DATA_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-data/
+      gsutil -m cp -r "$TMP_FROYO_RECIPES_PDFS_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-recipes-pdfs/
+      gsutil -m cp -r "$TMP_FROYO_INGREDIENTS_PDFS_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-recipe-ingredients-pdfs/
+
+      rm -rf "$TMP_DIR_BASE"
+EOT
+}
+
+resource "null_resource" "unzip_and_upload_froyo_recipes" {
   provisioner "local-exec" {
-    when    = destroy
-    command = <<EOT
-      set -e
-      TMP_DIR_TO_DELETE=$(sed 's/.*: "\(.*\)"}/\1/' unzip_info.json)
-      rm -rf "$TMP_DIR_TO_DELETE"
-      rm -f unzip_info.json
-EOT
+    command = local.unzip_and_upload_command
   }
-
   triggers = {
-    dataset_files = sha1(join("", [for f in fileset("../datasets/", "**/*") : filesha1("../datasets/${f}")]))
+    recipe_archives_hash = sha1(join("", [
+      for f in fileset("../datasets/", "{froyo_data.tgz,froyo_recipe_pdfs-1.tgz,froyo_recipe_pdfs-2.tgz,froyo_recipe_ingredient_pdfs.tgz}") : filesha1("../datasets/${f}")
+    ]))
+    command_hash = sha1(local.unzip_and_upload_command)
   }
+  depends_on = [
+    time_sleep.sleep_after_bucket_creation
+  ]
 }
 
 resource "google_storage_bucket_object" "files_upload_to_gcs" {
-  for_each = fileset("${jsondecode(file("unzip_info.json")).tmp_dir}/datasets", "**/*")
-  source = "${jsondecode(file("unzip_info.json")).tmp_dir}/datasets/${each.value}"
-  name = "datasets/${each.value}"
-  bucket = "${local.data_and_code_bucket}"
+  for_each = toset(compact([for f in fileset("../datasets", "{*.zip,*.csv,*.parquet}") : (substr(f, -9, -1) == ".DS_Store" ? "" : f)]))
+  source   = "../datasets/${each.value}"
+  name     = "data/${each.value}"
+  bucket   = local.lakehouse_staging_bucket
   depends_on = [
-    null_resource.unzip_datasets,
     time_sleep.sleep_after_bucket_creation
   ]
 }
-
-resource "google_storage_bucket_object" "froyo_pdfs_upload_to_gcs" {
-  for_each = fileset("${jsondecode(file("unzip_info.json")).tmp_dir}/froyo_recipe_pdfs", "**/*")
-  source   = "${jsondecode(file("unzip_info.json")).tmp_dir}/froyo_recipe_pdfs/${each.value}"
-  name     = "datasets/froyo_recipe_pdfs/${each.value}"
-  bucket   = local.data_and_code_bucket
-  depends_on = [
-    null_resource.unzip_datasets,
-    time_sleep.sleep_after_bucket_creation
-  ]
-}
-
-
-/*******************************************
-Introducing sleep to minimize errors from
-dependencies having not completed
-********************************************/
-
-resource "time_sleep" "sleep_after_network_and_storage_steps" {
-  create_duration = "120s"
-  depends_on = [
-      time_sleep.sleep_after_network_and_firewall_creation,
-      time_sleep.sleep_after_bucket_creation
-  ]
-}
-
-
 
 /******************************************
 9b. BigQuery dataset creation
@@ -457,16 +450,15 @@ resource "google_bigquery_dataset" "bq_dataset_creation" {
 ******************************************/
 
 resource "google_composer_environment" "cloud_composer_env_creation" {
-  project = local.project_id
-  name   = "${local.project_id}-cc3"
-  region = local.location
-  provider = google-beta
+  project   = local.project_id
+  name      = "${local.solution_prefix}-cc3"
+  region    = local.location
+  provider  = google-beta
   config {
-
     software_config {
       image_version = local.CLOUD_COMPOSER3_IMG_VERSION 
       env_variables = {
-        AIRFLOW_VAR_CODE_BUCKET = "${local.data_and_code_bucket}"
+        AIRFLOW_VAR_CODE_BUCKET = "${local.lakehouse_code_bucket}"
         AIRFLOW_VAR_PROJECT_ID = "${local.project_id}"
         AIRFLOW_VAR_REGION = "${local.location}"
         AIRFLOW_VAR_SUBNET = "${local.spark_subnet_nm}"
@@ -474,19 +466,19 @@ resource "google_composer_environment" "cloud_composer_env_creation" {
         AIRFLOW_VAR_UMSA = "${local.umsa}"
         AIRFLOW_VAR_SPARK_RUNTIME_VERSION = "${local.S8S_SPARK_RUNTIME_VERSION}"
       }
+      
     }
-
     node_config {
-      network    = local.vpc_nm
-      subnetwork = local.spark_subnet_nm
-      service_account = local.umsa_fqn
+        network    = local.vpc_nm
+        subnetwork = local.spark_subnet_nm
+        service_account = local.umsa_fqn
     }
   }
-
   depends_on = [
-    time_sleep.sleep_after_network_and_storage_steps
+    time_sleep.sleep_after_network_and_firewall_creation,
+    time_sleep.sleep_after_bucket_creation,
+    google_bigquery_dataset.bq_dataset_creation
   ] 
-
   timeouts {
     create = "75m"
   } 
@@ -516,18 +508,27 @@ resource "google_storage_bucket_object" "upload_cc_dag_to_airflow_dag_bucket" {
   ]
 }
 
+/******************************************
+12a. Install gcloud alpha components
+******************************************/
+resource "null_resource" "gcloud_alpha_install" {
+  provisioner "local-exec" {
+    command = "gcloud components install alpha -q"
+  }
+}
+
 /*******************************************
-12. Create Iceberg REST catalog in 
+12b. Create Iceberg REST catalog in 
 Lakehouse Runtime Catalog service
 ******************************************/
 resource "null_resource" "iceberg_catalog" {
-  provisioner "local-exec" {
-    command = "gcloud alpha biglake catalogs create ${local.lakehouse_iceberg_catalog_name} --project=${local.project_id} --location=${local.location} --type=ICEBERG --impersonate-service-account=${local.umsa_fqn}"
-  }
   depends_on = [
-    google_storage_bucket.iceberg_warehouse_bucket_creation,
-    time_sleep.sleep_after_composer_creation
+    time_sleep.sleep_after_bucket_creation,
+    null_resource.gcloud_alpha_install
   ]
+  provisioner "local-exec" {
+    command = "gcloud alpha biglake iceberg catalogs create ${local.lakehouse_iceberg_catalog_name} --project=${local.project_id} --catalog-type=gcs-bucket --credential-mode=end-user --primary-location=${local.location}"
+  }
 }
 
 
@@ -536,15 +537,14 @@ resource "null_resource" "iceberg_catalog" {
 Lakehouse Runtime Catalog service
 ******************************************/
 resource "null_resource" "hive_catalog" {
-  provisioner "local-exec" {
-    command = "gcloud alpha biglake catalogs create ${local.lakehouse_hive_catalog_name} --project=${local.project_id} --location=${local.location} --type=HIVE --hive-options=location-uri=gs://${local.lakehouse_hive_warehouse_bucket} --impersonate-service-account=${local.umsa_fqn}"
-  }
   depends_on = [
-    google_storage_bucket.hive_warehouse_bucket_creation,
-    time_sleep.sleep_after_composer_creation
+    null_resource.gcloud_alpha_install,
+    time_sleep.sleep_after_bucket_creation
   ]
+  provisioner "local-exec" {
+    command = "gcloud alpha biglake hive catalogs create  ${local.lakehouse_hive_catalog_name} --project=${local.project_id} --location-uri=gs://${local.lakehouse_hive_catalog_name} --primary-location=${local.location} --impersonate-service-account=${local.umsa_fqn}"
+  }
 }
-
 
 /******************************************
 14. Output important variable
@@ -575,8 +575,8 @@ output "UMSA_FQN" {
   value = local.umsa_fqn
 }
 
-output "CODE_AND_DATA_BUCKET" {
-  value = local.data_and_code_bucket
+output "CODE_BUCKET" {
+  value = local.lakehouse_code_bucket
 }
 
 output "CLOUD_COMPOSER_DAG_BUCKET" {
