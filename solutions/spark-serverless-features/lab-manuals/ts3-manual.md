@@ -136,7 +136,7 @@ Read the lab - narrative below, review the code, and then start trying out the l
 
 ## Lakehouse runtime catalog
 
-This hands-on lab complements the blog post [Lakehouse Demystified - Part 4: Just enough about Lakehouse runtime catalog](TODO) blog post for an explanation. Reading the blog is recommended for full understanding of the product. 
+This hands-on lab complements the blog post [Lakehouse Demystified - Part 4: Just enough about Lakehouse runtime catalog](TODO) - reading the blog is recommended for full understanding of the product. The product documentation can be found [here](https://docs.cloud.google.com/lakehouse/docs/about-lakehouse-catalogs).
 
 <hr>
 
@@ -206,18 +206,88 @@ tail -f  ~/lakehouse-solutions-build/solutions/spark-serverless-features/provisi
 ### 3.4.1. Resources provisioned
 In this section, we will provision-
 
-1. Network, subnet, firewall rule
-2. Storage buckets for code, datasets, and for use with the services
-3. BigQuery dataset
-4. User Managed Service Account (UMSA)
-5. Requisite IAM permissions for the UMSA and yourself* 
-6. Copy of code, data, etc into buckets
-7. Iceberg catalog in Lakehouse runtime catalog service
-8. Hive catalog in Lakehouse runtime catalog service
-9. Managed Service for Apache Airflow** 
+#### 3.4.1.1. Network, subnet, firewall rule
 
+![README](../images/ts3-3-4-1-1-00.png)   
+<br><br>
+
+![README](../images/ts3-3-4-1-1-01.png)   
+<br><br>
+
+![README](../images/ts3-3-4-1-1-02.png)   
+<br><br>
+
+<hr>
+
+
+#### 3.4.1.2. Storage buckets for code, datasets, and for use with the services
+
+![README](../images/ts3-3-4-1-2-00.png)   
+<br><br>
+
+<hr>
+
+#### 3.4.1.3. User Managed Service Account (UMSA)
+
+![README](../images/ts3-3-4-1-3-00.png)   
+<br><br>
+
+
+
+<hr>
+
+#### 3.4.1.4. Requisite IAM permissions for the UMSA and yourself* 
 *IAM permissions for yourself in case you want to go the console route instead of the programmatic route.<br>
+
+
+![README](../images/ts3-3-4-1-4-00.png)   
+<br><br>
+
+Permissions for you to act as service account.
+
+![README](../images/ts3-3-4-1-3-01.png)   
+<br><br>
+
+![README](../images/ts3-3-4-1-3-02.png)   
+<br><br>
+
+![README](../images/ts3-3-4-1-3-03.png)   
+<br><br>
+
+
+<hr>
+
+#### 3.4.1.5. Copy of code, data, etc into buckets
+
+
+![README](../images/ts3-3-4-1-5-00.png)   
+<br><br>
+
+
+![README](../images/ts3-3-4-1-5-01.png)   
+<br><br>
+
+<hr>
+
+#### 3.4.1.6. Iceberg catalog in Lakehouse runtime catalog service
+
+
+![README](../images/ts3-3-4-1-6-00.png)   
+<br><br>
+
+<hr>
+
+#### 3.4.1.7. Hive catalog in Lakehouse runtime catalog service
+
+This is a private preview feature and there is no UI component yet and the list command is yet to be released. You can however check the catalog out via Spark - this is part of the lab.
+
+<hr>
+
+#### 3.4.1.8. Managed Service for Apache Airflow** 
 **Aiflow environment has been set up for the next solution that features data engineering pipeline on Managed Service for Apache Airflow
+
+![README](../images/ts3-3-4-1-8-00.png)   
+<br><br>
 
 <hr>
 
@@ -266,11 +336,15 @@ tail -f ~/lakehouse-solutions-build/solutions/spark-serverless-features/provisio
 
 ## 3.5. Explore the resources provisioned
 
+Refer section 3.4 and browse all the services provisioned. In this section we will just explore the data and code.
+
+
 Paste the following variables in Cloud Shell-
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
-DATA_BUCKET="qs-s8s-data_and_code_bucket-${PROJECT_NBR}"
+DATA_BUCKET="froyo-lakehouse-staging-${PROJECT_NBR}"
+CODE_BUCKET="froyo-lab-code-bucket-${PROJECT_NBR}"
 ```
 
 <br>
@@ -281,10 +355,10 @@ DATA_BUCKET="qs-s8s-data_and_code_bucket-${PROJECT_NBR}"
 
 Run this command in Cloud Shell-
 ```
-gsutil ls -r "gs://froyo-lab-code-bucket-$PROJECT_NBR"
+gcloud storage ls -r "gs://froyo-lab-code-bucket-$PROJECT_NBR"
 ```
 
-![README](../images/s8s-qs-351.png)   
+![README](../images/ts3-3-5-1-00.png)   
 <br><br>
 
 <hr>
@@ -293,35 +367,54 @@ gsutil ls -r "gs://froyo-lab-code-bucket-$PROJECT_NBR"
 
 Run this command in Cloud Shell-
 ```
-gsutil ls -r "gs://froyo-lakehouse-staging-$PROJECT_NBR/froyo-data"
+gcloud storage  ls -r "gs://$DATA_BUCKET/froyo-data"
 ```
 
-![README](../images/s8s-qs-352.png)   
+![README](../images/ts3-3-5-2-00.png)   
 <br><br>
 
 <hr>
 
 
-### 3.5.3. GCS bucket for unstructured data
+### 3.5.3. GCS bucket for unstructured data - froyo recipes
 
 Run this command in Cloud Shell-
 ```
-gsutil ls -r "gs://froyo-lakehouse-staging-$PROJECT_NBR/froyo-recipe-pdfs"
+gcloud storage  ls -r  "gs://$DATA_BUCKET/froyo-recipe-pdfs"
 ```
 
-![README](../images/s8s-qs-352.png)   
+
+![README](../images/ts3-3-5-3-00.png)   
+<br><br>
+
+
+![README](../images/ts3-3-5-3-01.png)   
+<br><br>
+
+![README](../images/ts3-3-5-3-02.png)   
 <br><br>
 
 <hr>
 
+### 3.5.4. GCS bucket for unstructured data - froyo recipe ingredients*
+We will use this in a future lab.<br>
 
-<hr>
+Run this command in Cloud Shell-
+```
+gcloud storage  ls -r  "gs://$DATA_BUCKET/froyo-recipe-ingredients-pdfs"
+```
 
 
-<hr>
+![README](../images/ts3-3-5-4-00.png)   
+<br><br>
 
 
+![README](../images/ts3-3-5-4-01.png)   
+<br><br>
 
+
+![README](../images/ts3-3-5-4-02.png)   
+<br><br>
 
 <hr>
 
