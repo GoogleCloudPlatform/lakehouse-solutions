@@ -141,7 +141,7 @@ This hands-on lab complements the blog post [Lakehouse Demystified - Part 4: Jus
 <hr>
 
 
-# 3. Lab
+# 3. Lab setup
 
 <hr>
 
@@ -417,8 +417,114 @@ gcloud storage  ls -r  "gs://$DATA_BUCKET/froyo-recipe-ingredients-pdfs"
 <br><br>
 
 <hr>
+<hr>
+
+# 4. Lab for Iceberg Catalog
+
+This lab has a notebook that you will upload to BigQuery Studio (Colab) and execute.
+Behind the scenes it uses Managed Spark Serverless - Interactive Sessions.
+
+## 4.1. Upload the notebook
+
+Go to BigQuery Studio and upload the [notebook](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS3/solutions/spark-serverless-features/provisioning-automation/core-tf/notebooks/lrc_iceberg_catalog_tutorial.ipynb) as shown below.
+
+a) Copy the notebook URL below.
+https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/main/solutions/spark-serverless-features/provisioning-automation/core-tf/notebooks/lrc_iceberg_catalog_tutorial.ipynb
+
+
+b) Go to BigQuery Studio and upload it
+
+![README](../images/ts3-4-1-00.png)   
+<br><br>
+
+<hr>
+
+Use this URL to upload notebook from URL:<br>
+https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/main/solutions/spark-serverless-features/provisioning-automation/core-tf/notebooks/lrc_iceberg_catalog_tutorial.ipynb
+
+![README](../images/ts3-4-1-01.png)   
+<br><br>
+
+## 4.2. Create a runtime, and connect to it
+
+![README](../images/ts3-4-2-00.png)   
+<br><br>
+
+<hr>
+
+![README](../images/ts3-4-2-01.png)   
+<br><br>
+
+<hr>
+
+This is what it looks like after you are connected to a runtime.
+![README](../images/ts3-4-2-02.png)   
+<br><br>
+
+<hr>
+
+
+## 4.3. Lab content - pictorial overview
+
+This lab uses synthetically generated frozen yogurt sales - retail dataset. As part of the lab, we will curate data and run some reports.
+
+### 4.3.1. Setup and create Iceberg catalog namespace
+
+![README](../images/ts3-4-3-1-00.png)   
+<br><br>
+
+### 4.3.2. Create a medallion architecture with Lakehouse runtime catalog for Iceberg as the metastore
+
+We will create 4 layers of medallion architecture-
+1. Bronze: Data as is from source
+2. Silver: Curated data with cleansing, and transformations applied
+3. Gold: Consumable data - denormalized/optimized for analysis
+4. Platinum: Data Mart with reports 
+
+![README](../images/ts3-4-3-2-00.png)   
+<br><br>
+
+### 4.3.3. [Optional] Apache Iceberg tutorial
+
+A 101 on Apache Iceberh
+![README](../images/ts3-4-3-3-00.png)   
+<br><br>
+
+### 4.3.4. [Optional] Data analysis lab with Data Science Agent in Colab notebooks
+
+![README](../images/ts3-4-3-3-00.png)   
+<br><br>
+
+
+## 4.4. Run through the lab
+
+Execute each section cell by cell for an immersive learning experience.
+
+<hr>
+<hr>
+
+# 5. Lab for Hive Catalog
+
+This is a **private preview feature** in mid-May 2026.Reach out to your Google Cloud account team to be **allow-listed** to try this feature out.
+
+In this lab, we will:
+1. Create a bucket for the Hive warehouse
+2. Create a catalog
+3. Create a database in the catalog
+4. Create a table (on froyo parquet data) registered in the catalog
+5. Run some queries
+
+The following is a **pictorial overview** of the lab.
+
+![README](../images/ts3-5-0-00.png)   
+<br><br>
+
+![README](../images/ts3-5-0-01.png)   
+<br><br>
+
+<hr>
 
 ##### =====================================================================================================
-##### THIS CONCLUDES THE LAB
-##### SHUT DOWN THE LAB TO AVOID BILLING
+##### THIS CONCLUDES THE LAB FOR LAKEHOUSE RUNTIME CATALOG
+##### SHUT DOWN THE LAB TO AVOID BILLING UNLESS YOU ARE WORKING ON SUBSEQUENT LABS
 ##### =====================================================================================================
