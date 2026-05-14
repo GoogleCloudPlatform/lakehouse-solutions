@@ -22,6 +22,8 @@ limitations under the License.*
 ### 1.1. Abstract
 This lab is **introductory** in nature and showcases running Apache Spark applications on Google Cloud Platform on the managed product - **Serverless Managed Service for Apache Spark**, with the serverless managed **Lakehouse runtime catalog** as the lakehouse metastore for **Iceberg catalog** and **Hive catalog**. The goal of the lab is to demystify **Lakehouse runtime catalog** through a (zero fluff, zero dazzle) minimum viable end to end example of frozen yogurt (froyo) retail sales analysis to accelerate adoption. This hands-on lab complements the blog post [Lakehouse Demystified - Part 4: Just enough about Lakehouse runtime catalog](TODO).
 
+Note: Lakehouse Hive runtime catalog is a private preview feature. Contact your account team for allow-listing.
+
 |  |  | 
 | -- | :--- | 
 | Technical Focus| **Lakehouse runtime catalog for Iceberg and Hive** |
@@ -99,25 +101,28 @@ Please refer to the [Lakehouse Demystified - Part 2](https://medium.com/google-c
 ![README](../images/ts3-1-8-2-00.png)   
 <br><br>
 
+We will build the medallion architecture with Apache Spark, and from silver layer and upwards, we will persist to Apache Iceberg format, with tables registered into Lakehouse Iceberg runtime catalog. We will ue frozen yogurt retail sales data generated with Gemini for the lab, and the platinum layer will imclude a number of reports generated with code assistance from Data Science Agent in Colab notebooks.
+
+
 <hr>
 
 ### 1.9. Lab Flow
 
-![README](../images/s8s-qs-01.png)   
+![README](../images/ts3-1-9-00.png)   
 <br><br>
 
 <hr>
 
-### 1.10. The data
+### 1.10. The data 
 
-![README](../images/s8s-qs-03.png)   
+![README](../images/ts3-1-10-00.png)   
 <br><br>
 
 <hr>
 
 ### 1.11. The relationships between the data entities
 
-![README](../images/s8s-qs-02.png)   
+![README](../images/ts3-1-11-00.png)   
 <br><br>
 
 <hr>
