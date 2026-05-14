@@ -78,6 +78,8 @@ Covered in subsequent sections - 3.3 and 3.4.
 | Provisioning Automation | Terraform for enabling Google APIs, service account creation, IAM permissions, organizational policy updates, network and firewall rules creation, storage buckets creation, file uploads to buckets |
 | Data engineering & analysis |  Spark notebooks on Colab in BigQuery Studio |
 |  Metastore |  Lakehouse Iceberg catalog for Iceberg and Hive - create and use |
+|  Code generation |  Data Science Agent in BigQuery Studio Colab notebook   |
+|  Table format Iceberg |  Apache Iceberg 101 with froyo data |
 
 <hr>
 
