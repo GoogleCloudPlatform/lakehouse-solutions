@@ -85,11 +85,11 @@ Covered in subsequent sections - 3.3 and 3.4.
 
 ### 1.8. Lab Architecture
 
-#### 1.8.1. Reference Architecture
+#### 1.8.1. Lakehouse Reference Architecture
 
-Please refer to the [Lakehouse Demystified - Part 4: Just enough about Lakehouse runtime catalog](TODO) blog post for an explanation.
+Please refer to the [Lakehouse Demystified - Part 2](https://medium.com/google-cloud/lakehouse-demystified-part-2-just-enough-managed-spark-serverless-on-google-cloud-for-batch-6ac3e5051794) blog post for an explanation.
 
-![README](../images/s8s-qs-04a.png)   
+![README](../spark-serverless-quickstart/../images/s8s-qs-04a.png)   
 <br><br>
 
 <hr>
