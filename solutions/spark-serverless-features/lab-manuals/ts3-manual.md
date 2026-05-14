@@ -25,7 +25,7 @@ This lab is **introductory** in nature and showcases running Apache Spark applic
 |  |  | 
 | -- | :--- | 
 | Technical Focus| **Lakehouse runtime catalog for Iceberg and Hive** |
-| Use case |  Frozen yogurt Sales Analysis |
+| Use case |  Frozen yogurt sales analysis |
 | Domain |  Retail |
 | Process | Data curation and analysis |
 | Dataset | Froyo sales - synthetically generated |
