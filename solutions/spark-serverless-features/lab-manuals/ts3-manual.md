@@ -433,7 +433,7 @@ Behind the scenes it uses Managed Spark Serverless - Interactive Sessions.
 
 ## 4.1. Upload the notebook
 
-Go to BigQuery Studio and upload the [notebook](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS3/solutions/spark-serverless-features/provisioning-automation/core-tf/notebooks/lrc_iceberg_catalog_tutorial.ipynb) as shown below.
+Go to BigQuery Studio and upload the [notebook](../provisioning-automation/core-tf/notebooks/lrc_iceberg_catalog_tutorial.ipynb) as shown below.
 
 a) Copy the notebook URL below.
 https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/main/solutions/spark-serverless-features/provisioning-automation/core-tf/notebooks/lrc_iceberg_catalog_tutorial.ipynb
@@ -514,6 +514,7 @@ Execute each section cell by cell for an immersive learning experience.
 
 This is a **private preview feature** in mid-May 2026.Reach out to your Google Cloud account team to be **allow-listed** to try this feature out.
 
+## 5.1. Lab content
 In this lab, we will:
 1. Create a bucket for the Hive warehouse
 2. Create a catalog
@@ -521,7 +522,7 @@ In this lab, we will:
 4. Create a table (on froyo parquet data) registered in the catalog
 5. Run some queries
 
-The following is a **pictorial overview** of the lab.
+## 5.2. Pictorial overview of the lab
 
 ![README](../images/ts3-5-0-00.png)   
 <br><br>
@@ -530,6 +531,11 @@ The following is a **pictorial overview** of the lab.
 <br><br>
 
 <hr>
+
+## 5.3. Lab
+
+1. Upload the notebook [here](../provisioning-automation/core-tf/notebooks/lrc_hive_catalog_tutorial.ipynb) to BigQuery Studio as shown in the previous section
+2. Run through the notebook in entirety
 
 ##### =====================================================================================================
 ##### THIS CONCLUDES THE LAB FOR LAKEHOUSE RUNTIME CATALOG
