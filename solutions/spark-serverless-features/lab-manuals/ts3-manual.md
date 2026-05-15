@@ -15,7 +15,7 @@ limitations under the License.*
 
 <hr>
 
-# Technical Solution 3: Introduction to Iceberg and Hive lakehouse metastores  
+# Technical Solution 3: Introduction to Iceberg and Hive lakehouse catalog managed service on Google Cloud  
 
 ## 1.0. About the lab
 
@@ -128,8 +128,27 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 <hr>
 
 
+### 1.12. Table of content
 
-### 1.12. For success
+| Focus | 
+| -- | 
+| [Lakehouse reference architecture](./ts3-manual.md#181-lakehouse-reference-architecture) | 
+| [Lab solution architecture](./ts3-manual.md#182-lab-solution-architecture) | 
+| [Lab flow](./ts3-manual.md#19-lab-flow) | 
+| [The data used in the lab](./ts3-manual.md#110-the-data) | 
+| [ER diagram of the lab data](./ts3-manual.md#111-the-relationships-between-the-data-entities) | 
+| [Product highlights](./ts3-manual.md#2-product-highlights) | 
+| [Lab setup with Terraform](./ts3-manual.md#3-lab-setup) | 
+| [Lab resources provisioned](./ts3-manual.md#35-explore-the-resources-provisioned) | 
+| [[ICEBERG CATALOG] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
+| [[ICEBERG CATALOG] Medallion architecture with Lakehouse runtime catalog for Iceberg](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
+| [[ICEBERG CATALOG] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
+| [Data Science Agent in Colab notebook - a primer](./ts3-manual.md#434-optional-data-analysis-lab-with-data-science-agent-in-colab-notebooks) | 
+| [[HIVE CATALOG] Lakehouse Hive runtime catalog lab](./ts3-manual.md#5-lab-for-hive-catalog) | 
+
+
+
+### 1.13. For success
 
 Read the lab - narrative below, review the code, and then start trying out the lab.
 
