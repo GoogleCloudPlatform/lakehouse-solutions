@@ -131,20 +131,20 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 ### 1.12. Table of content
 
 |#| Content | 
-|1| -- | :--- | 
-|2| [[INFORMATIONAL] Lakehouse reference architecture](./ts3-manual.md#181-lakehouse-reference-architecture) | 
-|3| [[ABOUT THE LAB] Lab solution architecture](./ts3-manual.md#182-lab-solution-architecture) | 
-|4| [[ABOUT THE LAB] Lab flow](./ts3-manual.md#19-lab-flow) | 
-|5| [[ABOUT THE LAB] The data used in the lab](./ts3-manual.md#110-the-data) | 
-|6| [[ABOUT THE LAB] ER diagram of the lab data](./ts3-manual.md#111-the-relationships-between-the-data-entities) | 
-|7| [[ABOUT THE LAKEHOUSE RUNTIME CATALOG] Product highlights](./ts3-manual.md#2-product-highlights) | 
-|8| [[LAB SETUP] Lab setup with Terraform](./ts3-manual.md#3-lab-setup) | 
-|9| [[LAB SETUP]Lab resources provisioned](./ts3-manual.md#35-explore-the-resources-provisioned) | 
-|10| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
-|11| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
-|12| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
-|13| [[BONUS] Data Science Agent in Colab notebook - a primer](./ts3-manual.md#434-optional-data-analysis-lab-with-data-science-agent-in-colab-notebooks) | 
-|14| [[HIVE CATALOG LAB] Lakehouse Hive runtime catalog lab](./ts3-manual.md#5-lab-for-hive-catalog) | 
+| -- | :--- | 
+|1| [[INFORMATIONAL] Lakehouse reference architecture](./ts3-manual.md#181-lakehouse-reference-architecture) | 
+|2| [[ABOUT THE LAB] Lab solution architecture](./ts3-manual.md#182-lab-solution-architecture) | 
+|3| [[ABOUT THE LAB] Lab flow](./ts3-manual.md#19-lab-flow) | 
+|4| [[ABOUT THE LAB] The data used in the lab](./ts3-manual.md#110-the-data) | 
+|5| [[ABOUT THE LAB] ER diagram of the lab data](./ts3-manual.md#111-the-relationships-between-the-data-entities) | 
+|6| [[ABOUT THE LAKEHOUSE RUNTIME CATALOG] Product highlights](./ts3-manual.md#2-product-highlights) | 
+|7| [[LAB SETUP] Lab setup with Terraform](./ts3-manual.md#3-lab-setup) | 
+|8| [[LAB SETUP]Lab resources provisioned](./ts3-manual.md#35-explore-the-resources-provisioned) | 
+|9| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
+|10| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
+|11| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
+|12| [[BONUS] Data Science Agent in Colab notebook - a primer](./ts3-manual.md#434-optional-data-analysis-lab-with-data-science-agent-in-colab-notebooks) | 
+|13| [[HIVE CATALOG LAB] Lakehouse Hive runtime catalog lab](./ts3-manual.md#5-lab-for-hive-catalog) | 
 
 <hr>
 
