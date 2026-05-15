@@ -493,13 +493,13 @@ We will create 4 layers of medallion architecture-
 
 ### 4.3.3. [Optional] Apache Iceberg tutorial
 
-A 101 on Apache Iceberh
+A 101 on Apache Iceberg
 ![README](../images/ts3-4-3-3-00.png)   
 <br><br>
 
 ### 4.3.4. [Optional] Data analysis lab with Data Science Agent in Colab notebooks
 
-![README](../images/ts3-4-3-3-00.png)   
+![README](../images/ts3-4-3-4-00.png)   
 <br><br>
 
 
