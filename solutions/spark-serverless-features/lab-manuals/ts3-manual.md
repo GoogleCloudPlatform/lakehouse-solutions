@@ -647,30 +647,13 @@ spark = (DataprocSparkSession.builder
 
 <hr>
 
-## 4.6. Authorization 
-
-### 4.6.1. Authorization - out of the box IAM roles
-There are fundamentally 3 out of the box [IAM roles](https://docs.cloud.google.com/lakehouse/docs/iam-roles#lakehouse-roles). These can be applied with ACLs.
-| |  |  | | 
-| -- | :--- | :--- | :--- | 
-| 1 | Lakehouse administrator | roles/biglake.admin | Provides full access to all lakehouse resources | 
-| 2 | Lakehouse editor | roles/biglake.editor | Provides read and write access to all lakehouse resources | 
-| 3 | Lakehouse viewer | roles/biglake.admin | Provides read-only access to all lakehouse resources |
-
-<hr>
-
-### 4.6.2. Access Control List (ACLs)
-The IAM roles in the section above can be applied with [ACLs at a project, catalog, namespace or table level](https://docs.cloud.google.com/lakehouse/docs/manage-tables-acl) to a user or an IAM group.
-
-<hr>
-
-### 4.6.4. Authenticating with End User Credentials - what's involved
+### 4.5.4. Authenticating with End User Credentials - what's involved
 In the lab you executed, *we authenticated to tables and data in storage as ourselves using end user credentials*.
 And access was granted at project level.
 
 <hr>
 
-### 4.6.5. Authenticating with credential vending - what's involved
+### 4.5.5. Authenticating with credential vending - what's involved
 
 1. You need to create a catalog with credential vending enabled OR update your catalog to support it
 
@@ -741,7 +724,26 @@ spark = (DataprocSparkSession.builder
 
 <hr>
 
-### 4.6.6. Abolsutely minimal access with just read only to one table - what's involved
+## 4.6. Authorization 
+
+### 4.6.1. Authorization - out of the box IAM roles
+There are fundamentally 3 out of the box [IAM roles](https://docs.cloud.google.com/lakehouse/docs/iam-roles#lakehouse-roles). These can be applied with ACLs.
+| |  |  | | 
+| -- | :--- | :--- | :--- | 
+| 1 | Lakehouse administrator | roles/biglake.admin | Provides full access to all lakehouse resources | 
+| 2 | Lakehouse editor | roles/biglake.editor | Provides read and write access to all lakehouse resources | 
+| 3 | Lakehouse viewer | roles/biglake.admin | Provides read-only access to all lakehouse resources |
+
+<hr>
+
+### 4.6.2. Access Control List (ACLs)
+The IAM roles in the section above can be applied with [ACLs at a project, catalog, namespace or table level](https://docs.cloud.google.com/lakehouse/docs/manage-tables-acl) to a user or an IAM group.
+
+<hr>
+
+
+
+### 4.6.3. Abolsutely minimal access with just read only to one table - what's involved
 
 If you want to give a user, just barebones access to read a specific table with no other access in the Google Cloud project, here is how you do it.
 
