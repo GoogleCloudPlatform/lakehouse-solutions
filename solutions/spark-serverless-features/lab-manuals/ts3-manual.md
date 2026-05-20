@@ -449,8 +449,11 @@ gcloud storage  ls -r  "gs://$DATA_BUCKET/froyo-recipe-ingredients-pdfs"
 
 # 4. Lab for Iceberg Catalog
 
-This lab has a notebook that you will upload to BigQuery Studio (Colab) and execute.
-Behind the scenes it uses Managed Spark Serverless - Interactive Sessions.
+1. This lab has a notebook that you will upload to BigQuery Studio (Colab) and execute.<br>
+2. Behind the scenes it uses Managed Spark Serverless - Interactive Sessions.<br>
+3. Authentication is with End User Credentials (EUC) - as yourself.<br>
+4. Authorization is not part of the lab but is explained with commands and screenshots.
+
 
 ## 4.1. Upload the notebook
 
@@ -527,6 +530,65 @@ A 101 on Apache Iceberg
 ## 4.4. Run through the lab
 
 Execute each section cell by cell for an immersive learning experience.
+
+## 4.5. Authentication and authorization with End User Credentials
+
+### 4.5.1. Authenticating as yourself and blanket access to all Iceberg  tables in the namespaces
+In this lab, *we are authenticating to tables and data in storage as ourselves using end user credentials*.
+In the terraform, we created a user managed service account (UMSA) - froyo-lab-umsa, and we granted this UMSA `roles/biglake.admin` role.
+This allows us to create catalog, namespace, tables and read and write to tables.
+
+Lets look at how to **grant selective access with principle of least privilege**.
+
+### 4.5.2. Granting selective access with principle of least privilege
+
+#### 4.5.2.1. IAM roles
+There are fundamentally 3 out of the box roles.
+| |  |  | | 
+| -- | :--- | :--- | :--- | 
+| 1 | Lakehouse administrator | roles/biglake.admin | Provides full access to all lakehouse resources | 
+| 2 | Lakehouse editor | roles/biglake.editor | Provides read and write access to all lakehouse resources | 
+| 3 | Lakehouse viewer | roles/biglake.admin | Provides read-only access to all lakehouse resources | 
+
+#### 4.5.2.2. Access Control Lists (ACLs)
+
+The roles above can be applied at a project, catalog, namespace, table level.
+
+#### 4.5.2.3. Minimal access with just read only to one table - what's involved
+
+If you want to give a user, just barebones access to read a specific table, here is how you do it.
+
+1. Avoid giving the user blanket project viewer access, prefer resource specific access.
+2. With EUC authentication mode, in addition to access to Lakehouse (formerly called Biglake), we need to give the user storage object viewer - ```roles/storage.objectViewer``` at project level or bucket level.
+3. If you want the user to be able to run queries against the Iceberg tables in BigQuery with PCNT syntax, they need - ```roles/bigquery.jobUser``` 
+4. Finaly - to apply read access to just one single table, you need create a policy file and then apply the policy.
+
+Here is an example:
+We want to give a user called Biscuit access read access to the Lakehouse Iceberg table `p_rdm_revenue_by_month` in the `froyo_ns` Iceberg namespace of the Lakehouse runtime catalog for Iceberg - `froyo_iceberg_lakehouse_catalog_30466744069`
+1. Create the policy file (`lrci-policy-json`) with the user or group (replace 'user:' with 'group:' for group access)
+```
+{
+  "bindings": [
+    {
+      "role": "roles/biglake.viewer",
+      "members": [
+        "user:biscuit@akhanolkar.altostrat.com",
+      ]
+    },
+  ],
+  "etag": "ACAB",
+  "version": 1
+}
+````
+
+2. Apply the polciy
+```
+gcloud alpha biglake iceberg tables set-iam-policy p_rdm_revenue_by_month lrci-policy.json --catalog="froyo_iceberg_lakehouse_catalog_30466744069" --namespace="froyo_ns"
+```
+
+3. With this, Biscuit can only access this one table and query it and does not have access to any other namespace or table.
+
+
 
 <hr>
 <hr>
