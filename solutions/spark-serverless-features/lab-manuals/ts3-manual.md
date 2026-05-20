@@ -31,7 +31,7 @@ Note: Lakehouse Hive runtime catalog is a private preview feature. Contact your 
 | Domain |  Retail |
 | Process | Data curation and analysis |
 | Dataset | Froyo sales - synthetically generated |
-| Lakehouse compute engine | Apache Spark on Serverless Managed Service for Apache Spark|
+| Lakehouse compute engine | Apache Spark on Serverless Managed Service for Apache Spark |
 
 
 #### What to expect:
@@ -82,6 +82,7 @@ Covered in subsequent sections - 3.3 and 3.4.
 |  Metastore |  Lakehouse Iceberg catalog for Iceberg and Hive - create and use |
 |  Code generation |  Data Science Agent in BigQuery Studio Colab notebook   |
 |  Table format Iceberg |  Apache Iceberg 101 with froyo data |
+|  Lakehouse governance |  a) End User Credentials and Credential Vending authentication modes<br>b) Table ACLs for authorization<br>c) Entries in Knowledge Catalog<br>d) Data lineage captured in Knowledge Catalog |
 
 <hr>
 
