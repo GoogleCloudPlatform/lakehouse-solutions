@@ -662,7 +662,7 @@ The IAM roles in the section above can be applied with ACLs at a project, catalo
 
 <hr>
 
-### 4.6.4. Iceberg lab with End User Credentials
+### 4.6.4. Authenticating with End User Credentials - what's involved
 In the lab you executed, *we authenticated to tables and data in storage as ourselves using end user credentials*.
 And access was granted at project level.
 
@@ -737,7 +737,7 @@ spark = (DataprocSparkSession.builder
 
 ```
 
-
+<hr>
 
 ### 4.6.6. Abolsutely minimal access with just read only to one table - what's involved
 
