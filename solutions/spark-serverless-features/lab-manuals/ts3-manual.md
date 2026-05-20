@@ -560,7 +560,7 @@ Execute each section cell by cell for an immersive learning experience.
 
 | |  |  |
 | -- | :--- | :--- | 
-| 1 | End User Credentials | as yourself - great for autinng individual access | 
+| 1 | End User Credentials | As yourself/individual user access | 
 | 2 | Service Account | many users can impersonate a single non-human application principal | 
 | 3 | Credential vending | Credential vending for the Lakehouse runtime catalog lets you delegate storage access and apply fine-grained permissions to your data files. This capability lets you manage Identity and Access Management (IAM) policies at the table level for tables stored in Cloud Storage - you give access to the tables in the catalog, not to the storage. |
 
