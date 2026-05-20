@@ -141,6 +141,9 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 |6| [[ABOUT THE LAKEHOUSE RUNTIME CATALOG] Product highlights](./ts3-manual.md#2-product-highlights) | 
 |7| [[LAB SETUP] Lab setup with Terraform](./ts3-manual.md#3-lab-setup) | 
 |8| [[LAB SETUP] Lab resources provisioned](./ts3-manual.md#35-explore-the-resources-provisioned) | 
+|9| [[INFORMATIONAL] Authentication modes for Lakehouse runtime catalog](./ts3-manual.md#461-authentication-modes-supported-with-lakehouse-runtime-catalog) | 
+|10| [[INFORMATIONAL] Spark session configruation for Credential vending authentication mode](./ts3-manual.md#35-explore-the-resources-provisioned) | 
+|11| [[INFORMATIONAL] Spark session configruation for Credential vending authentication mode](./ts3-manual.md#35-explore-the-resources-provisioned) | 
 |9| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
 |10| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg with end user credentials, table ACLs, Knowledge Catalog entries, lineage, profiling and quality](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
 |11| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
@@ -548,7 +551,7 @@ Execute each section cell by cell for an immersive learning experience.
 
 The following are Spark session configurations, and in the example below, specific to Managed Spark Serverless - interactive sessions.
 
-### 4.5.1. With End User Credentials authentication mode
+### 4.5.1. End User Credentials authentication mode
 
 ```
 from google.cloud.dataproc_spark_connect import DataprocSparkSession
@@ -613,7 +616,7 @@ spark = (DataprocSparkSession.builder
 ```
 
 
-### 4.5.2. With **Credential Vending** authentication mode
+### 4.5.2. **Credential Vending** authentication mode
 
 ```
 from google.cloud.dataproc_spark_connect import DataprocSparkSession
