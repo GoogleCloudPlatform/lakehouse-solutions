@@ -143,10 +143,9 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 |8| [[LAB SETUP] Lab resources provisioned](./ts3-manual.md#35-explore-the-resources-provisioned) | 
 |9| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
 |10| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg with end user credentials, table ACLs, Knowledge Catalog entries, lineage, profiling and quality](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
-|11| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab with credential vending](./ts3-manual.md#43-lab-content---pictorial-overview) | 
-|12| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
-|13| [[BONUS] Prompt based data anaysis with Data Science Agent in Colab notebook - a primer](./ts3-manual.md#434-optional-data-analysis-lab-with-data-science-agent-in-colab-notebooks) | 
-|14| [[HIVE CATALOG LAB] Lakehouse Hive runtime catalog lab](./ts3-manual.md#5-lab-for-hive-catalog) | 
+|11| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
+|12| [[BONUS] Prompt based data anaysis with Data Science Agent in Colab notebook - a primer](./ts3-manual.md#434-optional-data-analysis-lab-with-data-science-agent-in-colab-notebooks) | 
+|13| [[HIVE CATALOG LAB] Lakehouse Hive runtime catalog lab](./ts3-manual.md#5-lab-for-hive-catalog) | 
 
 <hr>
 
@@ -476,6 +475,8 @@ https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/main/solutions/s
 ![README](../images/ts3-4-1-01.png)   
 <br><br>
 
+<hr>
+
 ## 4.2. Create a runtime, and connect to it
 
 ![README](../images/ts3-4-2-00.png)   
@@ -499,10 +500,14 @@ This is what it looks like after you are connected to a runtime.
 
 This lab uses synthetically generated frozen yogurt sales - retail dataset. As part of the lab, we will curate data and run some reports.
 
+<hr>
+
 ### 4.3.1. Setup and create Iceberg catalog namespace
 
 ![README](../images/ts3-4-3-1-00.png)   
 <br><br>
+
+<hr>
 
 ### 4.3.2. Create a medallion architecture with Lakehouse runtime catalog for Iceberg as the metastore
 
@@ -515,57 +520,258 @@ We will create 4 layers of medallion architecture-
 ![README](../images/ts3-4-3-2-00.png)   
 <br><br>
 
+<hr>
+
 ### 4.3.3. [Optional] Apache Iceberg tutorial
 
 A 101 on Apache Iceberg
 ![README](../images/ts3-4-3-3-00.png)   
 <br><br>
 
+<hr>
+
 ### 4.3.4. [Optional] Data analysis lab with Data Science Agent in Colab notebooks
 
 ![README](../images/ts3-4-3-4-00.png)   
 <br><br>
+
+<hr>
 
 
 ## 4.4. Run through the lab
 
 Execute each section cell by cell for an immersive learning experience.
 
-## 4.5. Authentication and authorization with End User Credentials
+<hr>
 
-### 4.5.1. Authenticating as yourself and blanket access to all Iceberg  tables in the namespaces
-In this lab, *we are authenticating to tables and data in storage as ourselves using end user credentials*.
-In the terraform, we created a user managed service account (UMSA) - froyo-lab-umsa, and we granted this UMSA `roles/biglake.admin` role.
-This allows us to create catalog, namespace, tables and read and write to tables.
+## 4.5. Spark session configuration for Lakehouse runtime catalog
 
-Lets look at how to **grant selective access with principle of least privilege**.
+The following are Spark session configurations, and in the example below, specific to Managed Spark Serverless - interactive sessions.
 
-### 4.5.2. Granting selective access with principle of least privilege
+### 4.5.1. With End User Credentials authentication mode
 
-#### 4.5.2.1. IAM roles
-There are fundamentally 3 out of the box roles.
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta"
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta" # for lineage
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true"
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage"
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener"
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs"
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG"
+
+
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+```
+
+
+### 4.5.2. With **Credential Vending** authentication mode
+
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta"
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true"
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage"
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener"
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs"
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG"
+
+
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+```
+
+
+<hr>
+
+## 4.6. Authentication and authorization with End User Credentials
+
+### 4.6.1. Authentication modes supported with Lakehouse runtime catalog
+
+| |  |  |
+| -- | :--- | :--- | 
+| 1 | End User Credentials | as yourself - great for autinng individual access | 
+| 2 | Service Account | many users can impersonate a single non-human application principal | 
+| 3 | Credential vending | Credential vending for the Lakehouse runtime catalog lets you delegate storage access and apply fine-grained permissions to your data files. This capability lets you manage Identity and Access Management (IAM) policies at the table level for tables stored in Cloud Storage - you give access to the tables in the catalog, not to the storage. |
+
+<hr>
+
+### 4.6.2. Authorization - out of the box IAM roles
+There are fundamentally 3 out of the box roles. These can be applied with ACLs.
 | |  |  | | 
 | -- | :--- | :--- | :--- | 
 | 1 | Lakehouse administrator | roles/biglake.admin | Provides full access to all lakehouse resources | 
 | 2 | Lakehouse editor | roles/biglake.editor | Provides read and write access to all lakehouse resources | 
-| 3 | Lakehouse viewer | roles/biglake.admin | Provides read-only access to all lakehouse resources | 
+| 3 | Lakehouse viewer | roles/biglake.admin | Provides read-only access to all lakehouse resources |
 
-#### 4.5.2.2. Access Control Lists (ACLs)
+<hr>
 
-The roles above can be applied at a project, catalog, namespace, table level.
+### 4.6.3. Access Control List (ACLs)
+The IAM roles in the section above can be applied with ACLs at a project, catalog, namespace or table level to a user or an IAM group.
 
-#### 4.5.2.3. Minimal access with just read only to one table - what's involved
+<hr>
 
-If you want to give a user, just barebones access to read a specific table, here is how you do it.
+### 4.6.4. Iceberg lab with End User Credentials
+In the lab you executed, *we authenticated to tables and data in storage as ourselves using end user credentials*.
+And access was granted at project level.
 
-1. Avoid giving the user blanket project viewer access, prefer resource specific access.
-2. With EUC authentication mode, in addition to access to Lakehouse (formerly called Biglake), we need to give the user storage object viewer - ```roles/storage.objectViewer``` at project level or bucket level.
+<hr>
+
+### 4.6.5. Authenticating with credential vending - what's involved
+
+1. You need to create a catalog with credential vending enabled OR update your catalog to support it
+
+![README](../images/ts3-4-5-5-00.png)   
+<br><br>
+
+
+
+2. Once enabled, a service account is created by default. This service account is not visible in IAM as its owned by the product - not the consumer project (your project).
+
+![README](../images/ts3-4-5-5-01.png)   
+<br><br>
+
+
+
+3. This service account needs to be granted storage object user roles
+
+![README](../images/ts3-4-5-5-02.png)   
+<br><br>
+
+![README](../images/ts3-4-5-5-02a.png)   
+<br><br>
+
+
+6. You still need table ACLs to minimize access, but you dont need to grant storage access to your users.
+
+<br>
+
+8. In terms of Spark session configs including credential vending, the following is the list:
+
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta"
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties["spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties["spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.X-Iceberg-Access-Delegation"] = "vended-credentials"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.gcs.oauth2.refresh-credentials-endpoint"] = "https://oauth2.googleapis.com/token"
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true"
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage"
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener"
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs"
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG"
+
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+
+```
+
+
+
+### 4.6.6. Abolsutely minimal access with just read only to one table - what's involved
+
+If you want to give a user, just barebones access to read a specific table with no other access in the Google Cloud project, here is how you do it.
+
+**NOTE**: Avoid giving the user blanket project viewer access, prefer resource specific access.
+
+1. With EUC authentication mode, in addition to access to Lakehouse (formerly called Biglake), we need to give the user storage object viewer - ```roles/storage.objectViewer``` at project level or Lakehouse bucket level.
+2. With credential vending authentication mode, the user does not need access to the Lakehouse storage bucket whatsoever
 3. If you want the user to be able to run queries against the Iceberg tables in BigQuery with PCNT syntax, they need - ```roles/bigquery.jobUser``` 
-4. Finaly - to apply read access to just one single table, you need create a policy file and then apply the policy.
+4. Finaly - to apply read access to just one single table, you need create a policy file and then apply the policy as shown below. Modify the role to `roles/biglake.editor` or `roles/biglake.admin` as needed, and the member to `group` if you dont want to set at `user` level.
 
-Here is an example:
-We want to give a user called Biscuit access read access to the Lakehouse Iceberg table `p_rdm_revenue_by_month` in the `froyo_ns` Iceberg namespace of the Lakehouse runtime catalog for Iceberg - `froyo_iceberg_lakehouse_catalog_30466744069`
-1. Create the policy file (`lrci-policy-json`) with the user or group (replace 'user:' with 'group:' for group access)
+Here is an example:<br>
+We want to give a user called Biscuit read access to the Lakehouse Iceberg table `p_rdm_revenue_by_month` in the `froyo_ns` Iceberg namespace within the Lakehouse runtime catalog for Iceberg - `froyo_iceberg_lakehouse_catalog_30466744069`<br>
+1. Create the policy file (`lrci-policy-json`) with the user or group (replace 'user:' with 'group:' for group access)<br>
 ```
 {
   "bindings": [
@@ -581,14 +787,12 @@ We want to give a user called Biscuit access read access to the Lakehouse Iceber
 }
 ````
 
-2. Apply the polciy
+2. Apply the policy
 ```
 gcloud alpha biglake iceberg tables set-iam-policy p_rdm_revenue_by_month lrci-policy.json --catalog="froyo_iceberg_lakehouse_catalog_30466744069" --namespace="froyo_ns"
 ```
 
 3. With this, Biscuit can only access this one table and query it and does not have access to any other namespace or table.
-
-
 
 <hr>
 <hr>
