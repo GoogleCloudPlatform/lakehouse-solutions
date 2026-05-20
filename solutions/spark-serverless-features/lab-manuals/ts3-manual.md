@@ -144,10 +144,10 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 |9| [[INFORMATIONAL] Authentication modes for Lakehouse runtime catalog](./ts3-manual.md#451-authentication-modes-supported-with-lakehouse-runtime-catalog) | 
 |10| [[INFORMATIONAL] Spark session configruation for **End User Credentials** authentication mode](./ts3-manual.md#451-end-user-credentials-authentication-mode)| 
 |11| [[INFORMATIONAL] Spark session configruation for **Credential Vending** authentication mode](./ts3-manual.md#453-spark-session-configuration-for-credential-vending-authentication-mode)| 
-|12| [[INFORMATIONAL] Authorization - out of the box IAM roles](./ts3-manual.md#461-authorization---out-of-the-box-iam-roles)|
-|13| [[INFORMATIONAL] Access Control List (ACLs)](./ts3-manual.md#461-authorization---out-of-the-box-iam-roles)|
-|14| [[INFORMATIONAL] Authenticating with End User Credentials - what's involved](./ts3-manual.md#464-authenticating-with-end-user-credentials---whats-involved)|
-|15| [[INFORMATIONAL] Authenticating with Credential Vending - what's involved](./ts3-manual.md#465-authenticating-with-credential-vending---whats-involved) |
+|12| [[INFORMATIONAL] Authenticating with End User Credentials - what's involved](./ts3-manual.md#454-authenticating-with-end-user-credentials---whats-involved)|
+|13| [[INFORMATIONAL] Authenticating with Credential Vending - what's involved](./ts3-manual.md#455-authenticating-with-credential-vending---whats-involved) |
+|14| [[INFORMATIONAL] Authorization - out of the box IAM roles](./ts3-manual.md#461-authorization---out-of-the-box-iam-roles)|
+|15| [[INFORMATIONAL] Access Control List (ACLs)](./ts3-manual.md#461-authorization---out-of-the-box-iam-roles)|
 |16| [[INFORMATIONAL] Abolsutely minimal access with just read only to one table - what's involved](./ts3-manual.md#466-abolsutely-minimal-access-with-just-read-only-to-one-table---whats-involved) |
 |17| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
 |18| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg with end user credentials](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
