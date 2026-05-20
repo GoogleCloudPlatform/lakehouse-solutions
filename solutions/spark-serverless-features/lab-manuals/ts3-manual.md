@@ -779,6 +779,116 @@ gcloud alpha biglake iceberg tables set-iam-policy p_rdm_revenue_by_month lrci-p
 3. With this, Biscuit can only access this one table and query it and does not have access to any other namespace or table.
 
 <hr>
+
+## 4.7. Knowledge Catalog - automated entry creation and lineage capture
+
+### 4.7.1. Spark - lineage configuration
+
+1. For lineage to be captured, we need the **Knowledge Catalog lineage API** to be enabled.<br>
+In the hands on lab, the lineage API is enabled already
+
+2. When authoring Spark code, we need the appropriate **Spark configs for lineage capture** in place.<br>
+The below is specific to Managed Spark Serverless Interactive Sessions.
+
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta"
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+
+# Lineage configs
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG" # Lineage specific
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+
+```
+
+### 4.7.2. Automated Knowledge Catalog entry creation
+
+
+
+1. Catalog entries:
+When a Lakehouse runtime catalog is created, an entry is created in Knowledge Catalog automatically
+
+
+![README](../images/ts3-4-7-2-1-00.png)   
+<br><br>
+
+
+![README](../images/ts3-4-7-2-1-01.png)   
+<br><br>
+
+3. Namespace entries:
+When a Iceberg namespace is created in the Lakehouse runtime catalog, an entry is created in Knowledge Catalog automatically
+
+![README](../images/ts3-4-7-2-2-00.png)   
+<br><br>
+
+
+![README](../images/ts3-4-7-2-2-01.png)   
+<br><br>
+
+5. Table entries:
+When a table is registered into a Iceberg namespace is created in the Lakehouse runtime catalog, an entry is created in Knowledge Catalog automatically
+
+![README](../images/ts3-4-7-2-3-00.png)   
+<br><br>
+
+
+![README](../images/ts3-4-7-2-3-01.png)   
+<br><br>
+
+![README](../images/ts3-4-7-2-3-02.png)   
+<br><br>
+
+
+
+![README](../images/ts3-4-7-2-3-03.png)   
+<br><br>
+
+<hr>
+
+### 4.7.3. Automated lineage capture in Knowledge Catalog
+
+You can review lineage in your lab environment by following the screenshots below.<br>
+
+If you click on the entry for the table, and then on 'Lineage' you can see the lineage as shown below.
+
+![README](../images/ts3-4-7-3-00.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-01.png)   
+<br><br>
+
+Here is another one that shows upstream and downstream with many tables - all from the lab.
+
+![README](../images/ts3-4-7-3-02.png)   
+<br><br>
+
 <hr>
 
 # 5. Lab for Hive Catalog
