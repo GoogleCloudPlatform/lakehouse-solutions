@@ -142,8 +142,8 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 |7| [[LAB SETUP] Lab setup with Terraform](./ts3-manual.md#3-lab-setup) | 
 |8| [[LAB SETUP] Lab resources provisioned](./ts3-manual.md#35-explore-the-resources-provisioned) | 
 |9| [[INFORMATIONAL] Authentication modes for Lakehouse runtime catalog](./ts3-manual.md#461-authentication-modes-supported-with-lakehouse-runtime-catalog) | 
-|10| [[INFORMATIONAL] Spark session configruation for Credential vending authentication mode](./ts3-manual.md#35-explore-the-resources-provisioned) | 
-|11| [[INFORMATIONAL] Spark session configruation for Credential vending authentication mode](./ts3-manual.md#35-explore-the-resources-provisioned) | 
+|10| [[INFORMATIONAL] Spark session configruation for **End User Credentials** authentication mode](./ts3-manual.md#451-end-user-credentials-authentication-mode) | 
+|11| [[INFORMATIONAL] Spark session configruation for **Credential Vending** authentication mode](./ts3-manual.md#35-explore-the-resources-provisioned) | 
 |9| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
 |10| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg with end user credentials, table ACLs, Knowledge Catalog entries, lineage, profiling and quality](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
 |11| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
@@ -547,39 +547,22 @@ Execute each section cell by cell for an immersive learning experience.
 
 <hr>
 
-## 4.5. Spark session configuration for Lakehouse runtime catalog
+## 4.5. Authentication against Lakehouse runtime catalog
 
-The following are Spark session configurations, and in the example below, specific to Managed Spark Serverless - interactive sessions.
+### 4.5.1. Authentication modes supported with Lakehouse runtime catalog
 
-### 4.5.1. End User Credentials authentication mode
+| |  |  |
+| -- | :--- | :--- | 
+| 1 | End User Credentials | as yourself - great for autinng individual access | 
+| 2 | Service Account | many users can impersonate a single non-human application principal | 
+| 3 | Credential vending | Credential vending for the Lakehouse runtime catalog lets you delegate storage access and apply fine-grained permissions to your data files. This capability lets you manage Identity and Access Management (IAM) policies at the table level for tables stored in Cloud Storage - you give access to the tables in the catalog, not to the storage. |
 
+<hr>
+
+
+### 4.5.2. Spark session configuration for **End User Credentials** authentication mode
+The following are Spark session configurations, specific to Managed Spark Serverless - interactive sessions.
 ```
-from google.cloud.dataproc_spark_connect import DataprocSparkSession
-from google.cloud.dataproc_v1 import Session
-from pyspark.sql import functions as F
-
-REST_API_VERSION="v1beta"
-
-# Create the Dataproc Serverless session.
-s8s_spark_session = Session()
-
-# Serverless runtime at authoring was 3.0 with Iceberg 1.10
-s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
-s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
-s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
-
-spark = (DataprocSparkSession.builder
-    .appName(APP_NAME)
-    .dataprocSessionConfig(s8s_spark_session)
-    .getOrCreate())
-
 from google.cloud.dataproc_spark_connect import DataprocSparkSession
 from google.cloud.dataproc_v1 import Session
 from pyspark.sql import functions as F
@@ -616,8 +599,8 @@ spark = (DataprocSparkSession.builder
 ```
 
 
-### 4.5.2. **Credential Vending** authentication mode
-
+### 4.5.3. Spark session configuration for **Credential Vending** authentication mode
+The following are Spark session configurations, and in the example below, specific to Managed Spark Serverless - interactive sessions.
 ```
 from google.cloud.dataproc_spark_connect import DataprocSparkSession
 from google.cloud.dataproc_v1 import Session
@@ -657,19 +640,11 @@ spark = (DataprocSparkSession.builder
 
 <hr>
 
-## 4.6. Authentication and authorization with End User Credentials
+## 4.6. Authorization 
 
-### 4.6.1. Authentication modes supported with Lakehouse runtime catalog
 
-| |  |  |
-| -- | :--- | :--- | 
-| 1 | End User Credentials | as yourself - great for autinng individual access | 
-| 2 | Service Account | many users can impersonate a single non-human application principal | 
-| 3 | Credential vending | Credential vending for the Lakehouse runtime catalog lets you delegate storage access and apply fine-grained permissions to your data files. This capability lets you manage Identity and Access Management (IAM) policies at the table level for tables stored in Cloud Storage - you give access to the tables in the catalog, not to the storage. |
 
-<hr>
-
-### 4.6.2. Authorization - out of the box IAM roles
+### 4.6.1. Authorization - out of the box IAM roles
 There are fundamentally 3 out of the box roles. These can be applied with ACLs.
 | |  |  | | 
 | -- | :--- | :--- | :--- | 
@@ -679,7 +654,7 @@ There are fundamentally 3 out of the box roles. These can be applied with ACLs.
 
 <hr>
 
-### 4.6.3. Access Control List (ACLs)
+### 4.6.2. Access Control List (ACLs)
 The IAM roles in the section above can be applied with ACLs at a project, catalog, namespace or table level to a user or an IAM group.
 
 <hr>
