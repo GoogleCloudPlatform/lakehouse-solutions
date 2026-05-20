@@ -648,7 +648,7 @@ spark = (DataprocSparkSession.builder
 
 
 ### 4.6.1. Authorization - out of the box IAM roles
-There are fundamentally 3 out of the box roles. These can be applied with ACLs.
+There are fundamentally 3 out of the box [IAM roles](https://docs.cloud.google.com/lakehouse/docs/iam-roles#lakehouse-roles). These can be applied with ACLs.
 | |  |  | | 
 | -- | :--- | :--- | :--- | 
 | 1 | Lakehouse administrator | roles/biglake.admin | Provides full access to all lakehouse resources | 
@@ -658,7 +658,7 @@ There are fundamentally 3 out of the box roles. These can be applied with ACLs.
 <hr>
 
 ### 4.6.2. Access Control List (ACLs)
-The IAM roles in the section above can be applied with ACLs at a project, catalog, namespace or table level to a user or an IAM group.
+The IAM roles in the section above can be applied with [ACLs at a project, catalog, namespace or table level](https://docs.cloud.google.com/lakehouse/docs/manage-tables-acl) to a user or an IAM group.
 
 <hr>
 
