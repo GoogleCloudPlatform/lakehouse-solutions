@@ -31,7 +31,7 @@ Note: Lakehouse Hive runtime catalog is a private preview feature. Contact your 
 | Domain |  Retail |
 | Process | Data curation and analysis |
 | Dataset | Froyo sales - synthetically generated |
-| Lakehouse compute engine | Apache Spark on Serverless Managed Service for Apache Spark|
+| Lakehouse compute engine | Apache Spark on Serverless Managed Service for Apache Spark |
 
 
 #### What to expect:
@@ -82,6 +82,7 @@ Covered in subsequent sections - 3.3 and 3.4.
 |  Metastore |  Lakehouse Iceberg catalog for Iceberg and Hive - create and use |
 |  Code generation |  Data Science Agent in BigQuery Studio Colab notebook   |
 |  Table format Iceberg |  Apache Iceberg 101 with froyo data |
+|  Lakehouse governance |  a) End User Credentials and Credential Vending authentication modes<br>b) Table ACLs for authorization<br>c) Entries in Knowledge Catalog<br>d) Data lineage captured in Knowledge Catalog |
 
 <hr>
 
@@ -128,7 +129,7 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 <hr>
 
 
-### 1.12. Table of content
+### 1.12. Table of contents
 
 |#| Content | 
 | -- | :--- | 
@@ -140,11 +141,21 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 |6| [[ABOUT THE LAKEHOUSE RUNTIME CATALOG] Product highlights](./ts3-manual.md#2-product-highlights) | 
 |7| [[LAB SETUP] Lab setup with Terraform](./ts3-manual.md#3-lab-setup) | 
 |8| [[LAB SETUP] Lab resources provisioned](./ts3-manual.md#35-explore-the-resources-provisioned) | 
-|9| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
-|10| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
-|11| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
-|12| [[BONUS] Prompt based data anaysis with Data Science Agent in Colab notebook - a primer](./ts3-manual.md#434-optional-data-analysis-lab-with-data-science-agent-in-colab-notebooks) | 
-|13| [[HIVE CATALOG LAB] Lakehouse Hive runtime catalog lab](./ts3-manual.md#5-lab-for-hive-catalog) | 
+|9| [[INFORMATIONAL] Authentication modes for Lakehouse runtime catalog](./ts3-manual.md#451-authentication-modes-supported-with-lakehouse-runtime-catalog) | 
+|10| [[INFORMATIONAL] Spark session configruation for **End User Credentials** authentication mode](./ts3-manual.md#451-end-user-credentials-authentication-mode)| 
+|11| [[INFORMATIONAL] Spark session configruation for **Credential Vending** authentication mode](./ts3-manual.md#453-spark-session-configuration-for-credential-vending-authentication-mode)| 
+|12| [[INFORMATIONAL] Authorization - out of the box IAM roles](./ts3-manual.md#461-authorization---out-of-the-box-iam-roles)|
+|13| [[INFORMATIONAL] Access Control List (ACLs)](./ts3-manual.md#461-authorization---out-of-the-box-iam-roles)|
+|14| [[INFORMATIONAL] Authenticating with End User Credentials - what's involved](./ts3-manual.md#464-authenticating-with-end-user-credentials---whats-involved)|
+|15| [[INFORMATIONAL] Authenticating with Credential Vending - what's involved](./ts3-manual.md#465-authenticating-with-credential-vending---whats-involved) |
+|16| [[INFORMATIONAL] Abolsutely minimal access with just read only to one table - what's involved](./ts3-manual.md#466-abolsutely-minimal-access-with-just-read-only-to-one-table---whats-involved) |
+|17| [[ICEBERG CATALOG LAB] Lakehouse Iceberg runtime catalog lab - pictorial overview](./ts3-manual.md#43-lab-content---pictorial-overview) | 
+|18| [[ICEBERG CATALOG LAB] Medallion architecture with Lakehouse runtime catalog for Iceberg with end user credentials](./ts3-manual.md#432-create-a-medallion-architecture-with-lakehouse-runtime-catalog-for-iceberg-as-the-metastore) | 
+|21| [[ICEBERG CATALOG LAB] Out of the box data entry creation into Knowledge Catalog for Apache Iceberg tables in the Lakehouse runtime catalog](./ts3-manual.md#472-automated-knowledge-catalog-entry-creation) | 
+|20| [[ICEBERG CATALOG LAB] Out of the box data lineage for Apache Iceberg tables in the Lakehouse runtime catalog](./ts3-manual.md#473-automated-lineage-capture-in-knowledge-catalog) | 
+|21| [[ICEBERG CATALOG LAB] Apache Iceberg table format primer](./ts3-manual.md#433-optional-apache-iceberg-tutorial) | 
+|22| [[BONUS] Prompt based data anaysis with Data Science Agent in Colab notebook - a primer](./ts3-manual.md#434-optional-data-analysis-lab-with-data-science-agent-in-colab-notebooks) | 
+|23| [[HIVE CATALOG LAB] Lakehouse Hive runtime catalog lab](./ts3-manual.md#5-lab-for-hive-catalog) | 
 
 <hr>
 
@@ -447,8 +458,11 @@ gcloud storage  ls -r  "gs://$DATA_BUCKET/froyo-recipe-ingredients-pdfs"
 
 # 4. Lab for Iceberg Catalog
 
-This lab has a notebook that you will upload to BigQuery Studio (Colab) and execute.
-Behind the scenes it uses Managed Spark Serverless - Interactive Sessions.
+1. This lab has a notebook that you will upload to BigQuery Studio (Colab) and execute.<br>
+2. Behind the scenes it uses Managed Spark Serverless - Interactive Sessions.<br>
+3. Authentication is with End User Credentials (EUC) - as yourself.<br>
+4. Authorization is not part of the lab but is explained with commands and screenshots.
+
 
 ## 4.1. Upload the notebook
 
@@ -470,6 +484,8 @@ https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/main/solutions/s
 
 ![README](../images/ts3-4-1-01.png)   
 <br><br>
+
+<hr>
 
 ## 4.2. Create a runtime, and connect to it
 
@@ -494,10 +510,14 @@ This is what it looks like after you are connected to a runtime.
 
 This lab uses synthetically generated frozen yogurt sales - retail dataset. As part of the lab, we will curate data and run some reports.
 
+<hr>
+
 ### 4.3.1. Setup and create Iceberg catalog namespace
 
 ![README](../images/ts3-4-3-1-00.png)   
 <br><br>
+
+<hr>
 
 ### 4.3.2. Create a medallion architecture with Lakehouse runtime catalog for Iceberg as the metastore
 
@@ -510,21 +530,365 @@ We will create 4 layers of medallion architecture-
 ![README](../images/ts3-4-3-2-00.png)   
 <br><br>
 
+<hr>
+
 ### 4.3.3. [Optional] Apache Iceberg tutorial
 
 A 101 on Apache Iceberg
 ![README](../images/ts3-4-3-3-00.png)   
 <br><br>
 
+<hr>
+
 ### 4.3.4. [Optional] Data analysis lab with Data Science Agent in Colab notebooks
 
 ![README](../images/ts3-4-3-4-00.png)   
 <br><br>
 
+<hr>
+
 
 ## 4.4. Run through the lab
 
 Execute each section cell by cell for an immersive learning experience.
+
+<hr>
+
+## 4.5. Authentication against Lakehouse runtime catalog
+
+### 4.5.1. Authentication modes supported with Lakehouse runtime catalog
+
+| |  |  |
+| -- | :--- | :--- | 
+| 1 | End User Credentials | as yourself - great for autinng individual access | 
+| 2 | Service Account | many users can impersonate a single non-human application principal | 
+| 3 | Credential vending | Credential vending for the Lakehouse runtime catalog lets you delegate storage access and apply fine-grained permissions to your data files. This capability lets you manage Identity and Access Management (IAM) policies at the table level for tables stored in Cloud Storage - you give access to the tables in the catalog, not to the storage. |
+
+<hr>
+
+
+### 4.5.2. Spark session configuration for **End User Credentials** authentication mode
+The following are Spark session configurations, specific to Managed Spark Serverless - interactive sessions.
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta" # for lineage
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true"
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage"
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener"
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs"
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG"
+
+
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+```
+
+
+### 4.5.3. Spark session configuration for **Credential Vending** authentication mode
+The following are Spark session configurations, and in the example below, specific to Managed Spark Serverless - interactive sessions.
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta"
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true"
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage"
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener"
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs"
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG"
+
+
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+```
+
+
+<hr>
+
+## 4.6. Authorization 
+
+### 4.6.1. Authorization - out of the box IAM roles
+There are fundamentally 3 out of the box [IAM roles](https://docs.cloud.google.com/lakehouse/docs/iam-roles#lakehouse-roles). These can be applied with ACLs.
+| |  |  | | 
+| -- | :--- | :--- | :--- | 
+| 1 | Lakehouse administrator | roles/biglake.admin | Provides full access to all lakehouse resources | 
+| 2 | Lakehouse editor | roles/biglake.editor | Provides read and write access to all lakehouse resources | 
+| 3 | Lakehouse viewer | roles/biglake.admin | Provides read-only access to all lakehouse resources |
+
+<hr>
+
+### 4.6.2. Access Control List (ACLs)
+The IAM roles in the section above can be applied with [ACLs at a project, catalog, namespace or table level](https://docs.cloud.google.com/lakehouse/docs/manage-tables-acl) to a user or an IAM group.
+
+<hr>
+
+### 4.6.4. Authenticating with End User Credentials - what's involved
+In the lab you executed, *we authenticated to tables and data in storage as ourselves using end user credentials*.
+And access was granted at project level.
+
+<hr>
+
+### 4.6.5. Authenticating with credential vending - what's involved
+
+1. You need to create a catalog with credential vending enabled OR update your catalog to support it
+
+![README](../images/ts3-4-5-5-00.png)   
+<br><br>
+
+
+
+2. Once enabled, a service account is created by default. This service account is not visible in IAM as its owned by the product - not the consumer project (your project).
+
+![README](../images/ts3-4-5-5-01.png)   
+<br><br>
+
+
+
+3. This service account needs to be granted storage object user roles
+
+![README](../images/ts3-4-5-5-02.png)   
+<br><br>
+
+![README](../images/ts3-4-5-5-02a.png)   
+<br><br>
+
+
+6. You still need table ACLs to minimize access, but you dont need to grant storage access to your users.
+
+<br>
+
+8. In terms of Spark session configs including credential vending, the following is the list:
+
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta"
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties["spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties["spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.X-Iceberg-Access-Delegation"] = "vended-credentials"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.gcs.oauth2.refresh-credentials-endpoint"] = "https://oauth2.googleapis.com/token"
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true"
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage"
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener"
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs"
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG"
+
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+
+```
+
+<hr>
+
+### 4.6.6. Abolsutely minimal access with just read only to one table - what's involved
+
+If you want to give a user, just barebones access to read a specific table with no other access in the Google Cloud project, here is how you do it.
+
+**NOTE**: Avoid giving the user blanket project viewer access, prefer resource specific access.
+
+1. With EUC authentication mode, in addition to access to Lakehouse (formerly called Biglake), we need to give the user storage object viewer - ```roles/storage.objectViewer``` at project level or Lakehouse bucket level.
+2. With credential vending authentication mode, the user does not need access to the Lakehouse storage bucket whatsoever
+3. If you want the user to be able to run queries against the Iceberg tables in BigQuery with PCNT syntax, they need - ```roles/bigquery.jobUser``` 
+4. Finaly - to apply read access to just one single table, you need create a policy file and then apply the policy as shown below. Modify the role to `roles/biglake.editor` or `roles/biglake.admin` as needed, and the member to `group` if you dont want to set at `user` level.
+
+Here is an example:<br>
+We want to give a user called Biscuit read access to the Lakehouse Iceberg table `p_rdm_revenue_by_month` in the `froyo_ns` Iceberg namespace within the Lakehouse runtime catalog for Iceberg - `froyo_iceberg_lakehouse_catalog_30466744069`<br>
+1. Create the policy file (`lrci-policy-json`) with the user or group (replace 'user:' with 'group:' for group access)<br>
+```
+{
+  "bindings": [
+    {
+      "role": "roles/biglake.viewer",
+      "members": [
+        "user:biscuit@akhanolkar.altostrat.com",
+      ]
+    },
+  ],
+  "etag": "ACAB",
+  "version": 1
+}
+````
+
+2. Apply the policy
+```
+gcloud alpha biglake iceberg tables set-iam-policy p_rdm_revenue_by_month lrci-policy.json --catalog="froyo_iceberg_lakehouse_catalog_30466744069" --namespace="froyo_ns"
+```
+
+3. With this, Biscuit can only access this one table and query it and does not have access to any other namespace or table.
+
+<hr>
+
+## 4.7. Knowledge Catalog - automated entry creation and lineage capture
+
+### 4.7.1. Spark - lineage configuration
+
+1. For lineage to be captured, we need the **Knowledge Catalog lineage API** to be enabled.<br>
+In the hands on lab, the lineage API is enabled already
+
+2. When authoring Spark code, we need the appropriate **Spark configs for lineage capture** in place.<br>
+The below is specific to Managed Spark Serverless Interactive Sessions.
+
+```
+from google.cloud.dataproc_spark_connect import DataprocSparkSession
+from google.cloud.dataproc_v1 import Session
+from pyspark.sql import functions as F
+
+REST_API_VERSION="v1beta"
+
+# Create the Dataproc Serverless session.
+s8s_spark_session = Session()
+
+# Serverless runtime at authoring was 3.0 with Iceberg 1.10
+s8s_spark_session.runtime_config.properties[f"spark.sql.defaultCatalog"] = ICEBERG_CATALOG_NAME
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}"] = "org.apache.iceberg.spark.SparkCatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.type"] = "rest"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.uri"] = f"https://biglake.googleapis.com/iceberg/{REST_API_VERSION}/restcatalog"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.warehouse"] = f"gs://{ICEBERG_LAKEHOUSE_BUCKET_NAME}"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.io-impl"] = "org.apache.iceberg.gcp.gcs.GCSFileIO"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.header.x-goog-user-project"] = PROJECT_ID
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest.auth.type"] = "org.apache.iceberg.gcp.auth.GoogleAuthManager"
+s8s_spark_session.runtime_config.properties[f"spark.sql.extensions"] = "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions"
+s8s_spark_session.runtime_config.properties[f"spark.sql.catalog.{ICEBERG_CATALOG_NAME}.rest-metrics-reporting-enabled"] = "false"
+
+# Lineage configs
+s8s_spark_session.runtime_config.properties["spark.dataproc.lineage.enabled"] = "true" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.openlineage.transport.type"] = "gcplineage" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.extraListeners"] = "io.openlineage.spark.agent.OpenLineageSparkListener" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.sql.repl.eagerEval.enabled"] = "True" # Property values should be strings # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.openlineage.namespace"] = "froyo_spark_jobs" # Lineage specific
+s8s_spark_session.runtime_config.properties["spark.log.level.io.openlineage"] = "DEBUG" # Lineage specific
+
+spark = (DataprocSparkSession.builder
+    .appName(APP_NAME)
+    .dataprocSessionConfig(s8s_spark_session)
+    .getOrCreate())
+
+```
+
+<hr>
+
+### 4.7.2. Automated Knowledge Catalog entry creation
+
+
+
+1. Catalog entries:
+When a Lakehouse runtime catalog is created, an entry is created in Knowledge Catalog automatically
+
+
+![README](../images/ts3-4-7-2-1-00.png)   
+<br><br>
+
+
+![README](../images/ts3-4-7-2-1-01.png)   
+<br><br>
+
+3. Namespace entries:
+When a Iceberg namespace is created in the Lakehouse runtime catalog, an entry is created in Knowledge Catalog automatically
+
+![README](../images/ts3-4-7-2-2-00.png)   
+<br><br>
+
+
+![README](../images/ts3-4-7-2-2-01.png)   
+<br><br>
+
+5. Table entries:
+When a table is registered into a Iceberg namespace is created in the Lakehouse runtime catalog, an entry is created in Knowledge Catalog automatically
+
+![README](../images/ts3-4-7-2-3-00.png)   
+<br><br>
+
+
+![README](../images/ts3-4-7-2-3-01.png)   
+<br><br>
+
+![README](../images/ts3-4-7-2-3-02.png)   
+<br><br>
+
+
+
+![README](../images/ts3-4-7-2-3-03.png)   
+<br><br>
+
+<hr>
+
+### 4.7.3. Automated lineage capture in Knowledge Catalog
+
+You can review lineage in your lab environment by following the screenshots below.<br>
+
+If you click on the entry for the table, and then on 'Lineage' you can see the lineage as shown below.
+
+![README](../images/ts3-4-7-3-00.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-01.png)   
+<br><br>
+
+Here is another one that shows upstream and downstream with many tables - all from the lab.
+
+![README](../images/ts3-4-7-3-02.png)   
+<br><br>
 
 <hr>
 <hr>
