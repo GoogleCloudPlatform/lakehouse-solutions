@@ -870,9 +870,6 @@ When a table is registered into a Iceberg namespace is created in the Lakehouse 
 
 
 
-![README](../images/ts3-4-7-2-3-03.png)   
-<br><br>
-
 <hr>
 
 ### 4.7.3. Automated lineage capture in Knowledge Catalog
