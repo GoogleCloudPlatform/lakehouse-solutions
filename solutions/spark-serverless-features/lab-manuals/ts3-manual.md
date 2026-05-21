@@ -884,10 +884,38 @@ If you click on the entry for the table, and then on 'Lineage' you can see the l
 ![README](../images/ts3-4-7-3-01.png)   
 <br><br>
 
-Here is another one that shows upstream and downstream with many tables - all from the lab.
+Lets look at this more closely..for table lineage including processes that created the tables and queries run against them
 
-![README](../images/ts3-4-7-3-02.png)   
+![README](../images/ts3-4-7-3-02a.png)   
 <br><br>
+
+![README](../images/ts3-4-7-3-02b.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-02c.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-02d.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-02e.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-02f.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-02g.png)   
+<br><br>
+
+![README](../images/ts3-4-7-3-02a.png)   
+<br><br>
+
+Here is a table in the gold layer that shows upstream and downstream with many tables - all from this lab.
+
+![README](../images/ts3-4-7-3-03.png)   
+<br><br>
+
+
 
 <hr>
 <hr>
