@@ -102,7 +102,7 @@ Please refer to the [Lakehouse Demystified - Part 2](https://medium.com/google-c
 ![README](../images/ts3-1-8-2-00.png)   
 <br><br>
 
-We will build the medallion architecture with Apache Spark, and from silver layer and upwards, we will persist to Apache Iceberg format, with tables registered into Lakehouse Iceberg runtime catalog. We will use frozen yogurt retail sales data generated with Gemini for the lab, and the platinum layer will imclude a number of reports generated with code assistance from Data Science Agent in Colab notebooks.
+We will build the medallion architecture with Apache Spark, and from silver layer and upwards, we will persist to Apache Iceberg format, with tables registered into Lakehouse Iceberg runtime catalog. We will use frozen yogurt retail sales data generated with Gemini for the lab, and the platinum layer will include a number of reports generated with code assistance from Data Science Agent in Colab notebooks.
 
 
 <hr>
@@ -847,7 +847,7 @@ When a Lakehouse runtime catalog is created, an entry is created in Knowledge Ca
 ![README](../images/ts3-4-7-2-1-01.png)   
 <br><br>
 
-3. Namespace entries:
+2. Namespace entries:
 When a Iceberg namespace is created in the Lakehouse runtime catalog, an entry is created in Knowledge Catalog automatically
 
 ![README](../images/ts3-4-7-2-2-00.png)   
@@ -857,7 +857,7 @@ When a Iceberg namespace is created in the Lakehouse runtime catalog, an entry i
 ![README](../images/ts3-4-7-2-2-01.png)   
 <br><br>
 
-5. Table entries:
+3. Table entries:
 When a table is registered into a Iceberg namespace is created in the Lakehouse runtime catalog, an entry is created in Knowledge Catalog automatically
 
 ![README](../images/ts3-4-7-2-3-00.png)   
@@ -909,8 +909,6 @@ Lets look at this more closely..for table lineage including processes that creat
 ![README](../images/ts3-4-7-3-02g.png)   
 <br><br>
 
-![README](../images/ts3-4-7-3-02a.png)   
-<br><br>
 
 Here is a table in the gold layer that shows upstream and downstream with many tables - all from this lab.
 
@@ -924,7 +922,7 @@ Here is a table in the gold layer that shows upstream and downstream with many t
 
 # 5. Lab for Hive Catalog
 
-This is a **private preview feature** in mid-May 2026.Reach out to your Google Cloud account team to be **allow-listed** to try this feature out.
+This is a **private preview feature** in mid-May 2026. Reach out to your Google Cloud account team to be **allow-listed** to try this feature out.
 
 ## 5.1. Lab content
 In this lab, we will:
