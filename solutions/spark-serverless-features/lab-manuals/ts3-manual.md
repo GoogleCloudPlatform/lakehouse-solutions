@@ -102,7 +102,7 @@ Please refer to the [Lakehouse Demystified - Part 2](https://medium.com/google-c
 ![README](../images/ts3-1-8-2-00.png)   
 <br><br>
 
-We will build the medallion architecture with Apache Spark, and from silver layer and upwards, we will persist to Apache Iceberg format, with tables registered into Lakehouse Iceberg runtime catalog. We will ue frozen yogurt retail sales data generated with Gemini for the lab, and the platinum layer will imclude a number of reports generated with code assistance from Data Science Agent in Colab notebooks.
+We will build the medallion architecture with Apache Spark, and from silver layer and upwards, we will persist to Apache Iceberg format, with tables registered into Lakehouse Iceberg runtime catalog. We will use frozen yogurt retail sales data generated with Gemini for the lab, and the platinum layer will imclude a number of reports generated with code assistance from Data Science Agent in Colab notebooks.
 
 
 <hr>
