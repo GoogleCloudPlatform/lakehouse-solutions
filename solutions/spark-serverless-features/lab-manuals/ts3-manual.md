@@ -119,6 +119,8 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 ![README](../images/ts3-1-10-00.png)   
 <br><br>
 
+The unstructured data will be used in a subsequent hands-on lab.
+
 <hr>
 
 ### 1.11. The relationships between the data entities
