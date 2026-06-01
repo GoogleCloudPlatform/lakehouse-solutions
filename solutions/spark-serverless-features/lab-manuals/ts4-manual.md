@@ -161,7 +161,7 @@ gcloud dataproc batches submit pyspark ${BRONZE_LAYER_PROCESSING_SCRIPT_PATH} \
 
 ## L2. Test the Pyspark scripts for silver layer curation
 
-## L2.1. Curate customer master data
+### L2.1. Curate customer master data
 
 ```
 # Google Cloud environment configuration
@@ -175,6 +175,8 @@ export SPARK_RUNTIME_VERSION="3.0"
 export CODE_BUCKET="froyo-lab-code-bucket-30466744069"
 export SILVER_LAYER_PROCESSING_SCRIPT_PATH="gs://${CODE_BUCKET}/scripts/pyspark/silver_layer_curation.py"
 export LAKEHOUSE_BUCKET_NAME="froyo_iceberg_lakehouse_catalog_30466744069"
+export STAGING_BUCKET_NAME="froyo-lakehouse-staging-30466744069"
+
 export DATA_ENTITY_NAME="customers" 
 BATCH_ID=`echo $DATA_ENTITY_NAME | tr '_' '-'`
 REST_API_VERSION="v1beta"
@@ -182,15 +184,16 @@ REST_API_VERSION="v1beta"
 gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
     --project=${PROJECT_ID} \
     --region=${REGION} \
-    --batch="bronze-ingestion-${BATCH_ID}-$(date +%s)" \
+    --batch="silver-curation-${BATCH_ID}-$(date +%s)" \
     --version=${SPARK_RUNTIME_VERSION} \
     --subnet=${SUBNET_URI} \
     --service-account=${SERVICE_ACCOUNT} \
     --properties="spark.sql.adaptive.enabled=true,spark.sql.adaptive.advisoryPartitionSizeInBytes=128mb,spark.sql.adaptive.coalescePartitions.enabled=truespark.sql.catalog.lakehouse=org.apache.iceberg.spark.SparkCatalog,spark.sql.catalog.lakehouse.type=rest,spark.sql.catalog.lakehouse.uri=https://biglake.googleapis.com/iceberg/$REST_API_VERSION/restcatalog,spark.sql.catalog.lakehouse.warehouse=gs://$ICEBERG_LAKEHOUSE_BUCKET_NAME,spark.sql.catalog.lakehouse.io-impl=org.apache.iceberg.gcp.gcs.GCSFileIO,spark.sql.catalog.lakehouse.rest.auth.type=org.apache.iceberg.gcp.auth.GoogleAuthManager,spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions" \
     -- \
     ${PROJECT_ID} \
+    ${STAGING_BUCKET_NAME} \
     ${LAKEHOUSE_BUCKET_NAME} \
-    ${DATA_ENTITY_NAME} 
+    ${DATA_ENTITY_NAME}
 ```
 <hr>
 
