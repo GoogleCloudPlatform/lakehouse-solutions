@@ -12,16 +12,17 @@
 ```
 # Google Cloud environment configuration
 export PROJECT_ID="lakehouse-solutions-build"
+export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
 export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
 export SERVICE_ACCOUNT="froyo-lab-umsa@${PROJECT_ID}.iam.gserviceaccount.com"
 export SPARK_RUNTIME_VERSION="3.0"
 
 # Bucket and script configuration
-export CODE_BUCKET="froyo-lab-code-bucket-30466744069"
+export CODE_BUCKET="froyo-lab-code-bucket-$PROJECT_NBR"
 export BRONZE_LAYER_PROCESSING_SCRIPT_PATH="gs://${CODE_BUCKET}/scripts/pyspark/bronze_layer_ingestion.py"
-export STAGING_BUCKET_NAME="froyo-lakehouse-staging-30466744069"
-export LAKEHOUSE_BUCKET_NAME="froyo_iceberg_lakehouse_catalog_30466744069"
+export STAGING_BUCKET_NAME="froyo-lakehouse-staging-$PROJECT_NBR"
+export LAKEHOUSE_BUCKET_NAME="froyo_iceberg_lakehouse_catalog_$PROJECT_NBR"
 ```
 
 ### L1.2. Test the script for customer data ingestion
@@ -166,6 +167,7 @@ gcloud dataproc batches submit pyspark ${BRONZE_LAYER_PROCESSING_SCRIPT_PATH} \
 ```
 # Google Cloud environment configuration
 export PROJECT_ID="lakehouse-solutions-build"
+export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
 export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
 export SERVICE_ACCOUNT="froyo-lab-umsa@${PROJECT_ID}.iam.gserviceaccount.com"
@@ -174,8 +176,8 @@ export SPARK_RUNTIME_VERSION="3.0"
 # Bucket and script configuration
 export CODE_BUCKET="froyo-lab-code-bucket-30466744069"
 export SILVER_LAYER_PROCESSING_SCRIPT_PATH="gs://${CODE_BUCKET}/scripts/pyspark/silver_layer_curation.py"
-export LAKEHOUSE_BUCKET_NAME="froyo_iceberg_lakehouse_catalog_30466744069"
-export STAGING_BUCKET_NAME="froyo-lakehouse-staging-30466744069"
+export LAKEHOUSE_BUCKET_NAME="froyo_iceberg_lakehouse_catalog_$PROJECT_NBR"
+export STAGING_BUCKET_NAME="froyo-lakehouse-staging-$PROJECT_NBR"
 
 export DATA_ENTITY_NAME="customers" 
 BATCH_ID=`echo $DATA_ENTITY_NAME | tr '_' '-'`
@@ -188,7 +190,7 @@ gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
     --version=${SPARK_RUNTIME_VERSION} \
     --subnet=${SUBNET_URI} \
     --service-account=${SERVICE_ACCOUNT} \
-    --properties="spark.sql.adaptive.enabled=true,spark.sql.adaptive.advisoryPartitionSizeInBytes=128mb,spark.sql.adaptive.coalescePartitions.enabled=truespark.sql.catalog.lakehouse=org.apache.iceberg.spark.SparkCatalog,spark.sql.catalog.lakehouse.type=rest,spark.sql.catalog.lakehouse.uri=https://biglake.googleapis.com/iceberg/$REST_API_VERSION/restcatalog,spark.sql.catalog.lakehouse.warehouse=gs://$ICEBERG_LAKEHOUSE_BUCKET_NAME,spark.sql.catalog.lakehouse.io-impl=org.apache.iceberg.gcp.gcs.GCSFileIO,spark.sql.catalog.lakehouse.rest.auth.type=org.apache.iceberg.gcp.auth.GoogleAuthManager,spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions" \
+    --properties="spark.sql.adaptive.enabled=true,spark.sql.adaptive.advisoryPartitionSizeInBytes=128mb,spark.sql.adaptive.coalescePartitions.enabled=true,spark.sql.catalog.lakehouse=org.apache.iceberg.spark.SparkCatalog,spark.sql.catalog.lakehouse.type=rest,spark.sql.catalog.lakehouse.uri=https://biglake.googleapis.com/iceberg/$REST_API_VERSION/restcatalog,spark.sql.catalog.lakehouse.warehouse=gs://$ICEBERG_LAKEHOUSE_BUCKET_NAME,spark.sql.catalog.lakehouse.io-impl=org.apache.iceberg.gcp.gcs.GCSFileIO,spark.sql.catalog.lakehouse.rest.auth.type=org.apache.iceberg.gcp.auth.GoogleAuthManager,spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions" \
     -- \
     ${PROJECT_ID} \
     ${STAGING_BUCKET_NAME} \
