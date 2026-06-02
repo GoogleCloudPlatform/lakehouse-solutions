@@ -357,3 +357,57 @@ gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} 
     --properties="${SPARK_PROPERTIES}"  -- \
     ${REPORT_NAME} 
 ```
+
+### L4.3. Generate 'Average Order Value' report
+
+```
+REPORT_NAME="AVERAGE_ORDER_VALUE"
+BATCH_ID="platinum-layer-reporting"
+
+gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} \
+    --project=${PROJECT_ID} \
+    --region=${REGION} \
+    --batch="${BATCH_ID}-$(date +%s)" \
+    --version=${SPARK_RUNTIME_VERSION} \
+    --subnet=${SUBNET_URI} \
+    --service-account=${SERVICE_ACCOUNT} \
+    --properties="${SPARK_PROPERTIES}"  -- \
+    ${REPORT_NAME} 
+```
+
+
+### L4.4. Generate 'Top Ten Products' report
+
+```
+REPORT_NAME="TOP_TEN_PRODUCTS"
+BATCH_ID="platinum-layer-reporting"
+
+gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} \
+    --project=${PROJECT_ID} \
+    --region=${REGION} \
+    --batch="${BATCH_ID}-$(date +%s)" \
+    --version=${SPARK_RUNTIME_VERSION} \
+    --subnet=${SUBNET_URI} \
+    --service-account=${SERVICE_ACCOUNT} \
+    --properties="${SPARK_PROPERTIES}"  -- \
+    ${REPORT_NAME} 
+```
+
+
+### L4.5. Generate 'Customer Segmentation' report
+
+```
+REPORT_NAME="CUSTOMER_SEGMENTATION"
+BATCH_ID="platinum-layer-reporting"
+
+gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} \
+    --project=${PROJECT_ID} \
+    --region=${REGION} \
+    --batch="${BATCH_ID}-$(date +%s)" \
+    --version=${SPARK_RUNTIME_VERSION} \
+    --subnet=${SUBNET_URI} \
+    --service-account=${SERVICE_ACCOUNT} \
+    --properties="${SPARK_PROPERTIES}"  -- \
+    ${REPORT_NAME} 
+```
+
