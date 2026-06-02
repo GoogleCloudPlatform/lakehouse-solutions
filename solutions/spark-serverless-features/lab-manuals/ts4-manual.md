@@ -179,6 +179,7 @@ export SILVER_LAYER_PROCESSING_SCRIPT_PATH="gs://${CODE_BUCKET}/scripts/pyspark/
 export LAKEHOUSE_BUCKET_NAME="froyo_iceberg_lakehouse_catalog_$PROJECT_NBR"
 export STAGING_BUCKET_NAME="froyo-lakehouse-staging-$PROJECT_NBR"
 export ICEBERG_CATALOG_NAME="froyo_iceberg_lakehouse_catalog_$PROJECT_NBR"
+REST_API_VERSION="v1beta"
 export SPARK_PROPERTIES="spark.sql.adaptive.enabled=true,spark.sql.adaptive.advisoryPartitionSizeInBytes=128mb,spark.sql.adaptive.coalescePartitions.enabled=true,spark.sql.defaultCatalog=$ICEBERG_CATALOG_NAME,spark.sql.catalog.$ICEBERG_CATALOG_NAME=org.apache.iceberg.spark.SparkCatalog,spark.sql.catalog.$ICEBERG_CATALOG_NAME.type=rest,spark.sql.catalog.$ICEBERG_CATALOG_NAME.uri=https://biglake.googleapis.com/iceberg/$REST_API_VERSION/restcatalog,spark.sql.catalog.$ICEBERG_CATALOG_NAME.warehouse=gs://$LAKEHOUSE_BUCKET_NAME,spark.sql.catalog.$ICEBERG_CATALOG_NAME.io-impl=org.apache.iceberg.gcp.gcs.GCSFileIO,spark.sql.catalog.$ICEBERG_CATALOG_NAME.header.x-goog-user-project=$PROJECT_ID,spark.sql.catalog.$ICEBERG_CATALOG_NAME.rest.auth.type=org.apache.iceberg.gcp.auth.GoogleAuthManager,spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,
 spark.sql.catalog.$ICEBERG_CATALOG_NAME.rest-metrics-reporting-enabled=false,spark.dataproc.lineage.enabled=true,spark.openlineage.transport.type=gcplineage,spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.repl.eagerEval.enabled=True, spark.openlineage.namespace=froyo_spark_jobs"
 
@@ -190,7 +191,7 @@ spark.sql.catalog.$ICEBERG_CATALOG_NAME.rest-metrics-reporting-enabled=false,spa
 ```
 export DATA_ENTITY_NAME="customers" 
 BATCH_ID=`echo $DATA_ENTITY_NAME | tr '_' '-'`
-REST_API_VERSION="v1beta"
+
 
 gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
     --project=${PROJECT_ID} \
@@ -212,7 +213,7 @@ gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
 ```
 export DATA_ENTITY_NAME="customers_sensitive" 
 BATCH_ID=`echo $DATA_ENTITY_NAME | tr '_' '-'`
-REST_API_VERSION="v1beta"
+
 
 gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
     --project=${PROJECT_ID} \
@@ -234,7 +235,7 @@ gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
 ```
 export DATA_ENTITY_NAME="products" 
 BATCH_ID=`echo $DATA_ENTITY_NAME | tr '_' '-'`
-REST_API_VERSION="v1beta"
+
 
 gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
     --project=${PROJECT_ID} \
@@ -256,7 +257,7 @@ gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
 ```
 export DATA_ENTITY_NAME="orders" 
 BATCH_ID=`echo $DATA_ENTITY_NAME | tr '_' '-'`
-REST_API_VERSION="v1beta"
+
 
 gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
     --project=${PROJECT_ID} \
@@ -287,6 +288,7 @@ export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
 export SERVICE_ACCOUNT="froyo-lab-umsa@${PROJECT_ID}.iam.gserviceaccount.com"
 export SPARK_RUNTIME_VERSION="3.0"
+REST_API_VERSION="v1beta"
 
 # Bucket and script configuration
 export CODE_BUCKET="froyo-lab-code-bucket-$PROJECT_NBR"
