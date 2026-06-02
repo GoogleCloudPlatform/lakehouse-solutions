@@ -411,3 +411,18 @@ gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} 
     ${REPORT_NAME} 
 ```
 
+<hr>
+
+## L5. Update Airflow environment variables
+
+This takes a few minutes to complete.
+```
+export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
+export REGION="us-central1"
+export SPARK_RUNTIME_VERSION="3.0"
+
+gcloud composer environments update froyo-lab-cc3 \
+    --location $REGION \
+    --update-env-variables=AIRFLOW_VAR_SPARK_RUNTIME_VERSION=$SPARK_RUNTIME_VERSION,AIRFLOW_VAR_PROJECT_NUMBER=$PROJECT_NBR 
+```
