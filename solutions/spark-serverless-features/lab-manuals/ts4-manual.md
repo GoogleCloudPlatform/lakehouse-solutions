@@ -308,7 +308,7 @@ BATCH_ID="gold-layer-aggregation"
 gcloud dataproc batches submit pyspark ${GOLD_LAYER_PROCESSING_SCRIPT_PATH} \
     --project=${PROJECT_ID} \
     --region=${REGION} \
-    --batch="silver-curation-${BATCH_ID}-$(date +%s)" \
+    --batch="${BATCH_ID}-$(date +%s)" \
     --version=${SPARK_RUNTIME_VERSION} \
     --subnet=${SUBNET_URI} \
     --service-account=${SERVICE_ACCOUNT} \
