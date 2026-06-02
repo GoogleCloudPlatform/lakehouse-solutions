@@ -179,7 +179,7 @@ export SILVER_LAYER_PROCESSING_SCRIPT_PATH="gs://${CODE_BUCKET}/scripts/pyspark/
 export LAKEHOUSE_BUCKET_NAME="froyo_iceberg_lakehouse_catalog_$PROJECT_NBR"
 export STAGING_BUCKET_NAME="froyo-lakehouse-staging-$PROJECT_NBR"
 export ICEBERG_CATALOG_NAME="froyo_iceberg_lakehouse_catalog_$PROJECT_NBR"
-REST_API_VERSION="v1beta"
+export REST_API_VERSION="v1beta"
 export SPARK_PROPERTIES="spark.sql.adaptive.enabled=true,spark.sql.adaptive.advisoryPartitionSizeInBytes=128mb,spark.sql.adaptive.coalescePartitions.enabled=true,spark.sql.defaultCatalog=$ICEBERG_CATALOG_NAME,spark.sql.catalog.$ICEBERG_CATALOG_NAME=org.apache.iceberg.spark.SparkCatalog,spark.sql.catalog.$ICEBERG_CATALOG_NAME.type=rest,spark.sql.catalog.$ICEBERG_CATALOG_NAME.uri=https://biglake.googleapis.com/iceberg/$REST_API_VERSION/restcatalog,spark.sql.catalog.$ICEBERG_CATALOG_NAME.warehouse=gs://$LAKEHOUSE_BUCKET_NAME,spark.sql.catalog.$ICEBERG_CATALOG_NAME.io-impl=org.apache.iceberg.gcp.gcs.GCSFileIO,spark.sql.catalog.$ICEBERG_CATALOG_NAME.header.x-goog-user-project=$PROJECT_ID,spark.sql.catalog.$ICEBERG_CATALOG_NAME.rest.auth.type=org.apache.iceberg.gcp.auth.GoogleAuthManager,spark.sql.extensions=org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions,
 spark.sql.catalog.$ICEBERG_CATALOG_NAME.rest-metrics-reporting-enabled=false,spark.dataproc.lineage.enabled=true,spark.openlineage.transport.type=gcplineage,spark.extraListeners=io.openlineage.spark.agent.OpenLineageSparkListener,spark.sql.repl.eagerEval.enabled=True, spark.openlineage.namespace=froyo_spark_jobs"
 
@@ -288,7 +288,7 @@ export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
 export SERVICE_ACCOUNT="froyo-lab-umsa@${PROJECT_ID}.iam.gserviceaccount.com"
 export SPARK_RUNTIME_VERSION="3.0"
-REST_API_VERSION="v1beta"
+export REST_API_VERSION="v1beta"
 
 # Bucket and script configuration
 export CODE_BUCKET="froyo-lab-code-bucket-$PROJECT_NBR"
@@ -329,7 +329,7 @@ export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
 export SERVICE_ACCOUNT="froyo-lab-umsa@${PROJECT_ID}.iam.gserviceaccount.com"
 export SPARK_RUNTIME_VERSION="3.0"
-REST_API_VERSION="v1beta"
+export REST_API_VERSION="v1beta"
 
 # Bucket and script configuration
 export CODE_BUCKET="froyo-lab-code-bucket-$PROJECT_NBR"
@@ -421,8 +421,12 @@ export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null
 export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
 export REGION="us-central1"
 export SPARK_RUNTIME_VERSION="3.0"
+export LRC_REST_API_VERSION="v1beta"
+
 
 gcloud composer environments update froyo-lab-cc3 \
     --location $REGION \
-    --update-env-variables=AIRFLOW_VAR_SPARK_RUNTIME_VERSION=$SPARK_RUNTIME_VERSION,AIRFLOW_VAR_PROJECT_NUMBER=$PROJECT_NBR 
+    --update-env-variables=AIRFLOW_VAR_SPARK_RUNTIME_VERSION=$SPARK_RUNTIME_VERSION,AIRFLOW_VAR_PROJECT_NUMBER=$PROJECT_NBR,AIRFLOW_VAR_LRC_REST_API_VERSION=$LRC_REST_API_VERSION
+
+
 ```
