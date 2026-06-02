@@ -11,7 +11,7 @@
 
 ```
 # Google Cloud environment configuration
-export PROJECT_ID="lakehouse-solutions-build"
+export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
 export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
@@ -166,7 +166,7 @@ gcloud dataproc batches submit pyspark ${BRONZE_LAYER_PROCESSING_SCRIPT_PATH} \
 
 ```
 # Google Cloud environment configuration
-export PROJECT_ID="lakehouse-solutions-build"
+export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
 export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
@@ -281,7 +281,7 @@ gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
 
 ```
 # Google Cloud environment configuration
-export PROJECT_ID="lakehouse-solutions-build"
+export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
 export REGION="us-central1"
 export SUBNET_URI="projects/${PROJECT_ID}/regions/${REGION}/subnetworks/spark-froyo-snet"
