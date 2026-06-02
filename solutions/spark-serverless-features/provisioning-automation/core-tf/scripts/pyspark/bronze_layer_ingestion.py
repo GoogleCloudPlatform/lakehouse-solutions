@@ -13,35 +13,56 @@
 # limitations under the License.
 
 import sys
+import logging
 from pyspark.sql import SparkSession
 
-if len(sys.argv) != 5:
-    raise Exception("Exactly 4 arguments are required: <project_id> <staging bucket> <lakehouse bucket> <data_entity_name> ")
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 
-PROJECT_ID = sys.argv[1]
-STAGING_BUCKET_NAME = sys.argv[2]
-LAKEHOUSE_BUCKET_NAME = sys.argv[3]
-DATA_ENTITY_NAME = sys.argv[4]
+def ingest_to_bronze(spark: SparkSession, staging_bucket_name: str, lakehouse_bucket_name: str, data_entity_name: str):
+    """
+    Loads data from a staging bucket and writes it to the bronze layer in a lakehouse bucket.
+    """
+    source_path = f"gs://{staging_bucket_name}/froyo-data/{data_entity_name}"
+    destination_path = f"gs://{lakehouse_bucket_name}/froyo-raw/bronze/{data_entity_name}"
 
+    logging.info(f"Reading data from: {source_path}")
+    # For production workloads, it's a best practice to define an explicit schema
+    # rather than using `inferSchema=True`, which can be slow and error-prone.
+    df = spark.read.format("parquet").option("inferschema", True).load(source_path)
 
-spark = SparkSession.builder \
-    .appName(f"Bronze Layer Ingestion for {DATA_ENTITY_NAME}") \
-    .getOrCreate()
-
-
-try:
-    # Load parquet data from GCS staging bucket and persist to bronze (raw) layer with data in full fidelity
-    df = spark.read.format("parquet").option("inferschema",True).load(f"gs://{STAGING_BUCKET_NAME}/froyo-data/{DATA_ENTITY_NAME}")
-
+    logging.info(f"Writing data to: {destination_path}")
     # Write to bronze layer / raw layer
-    df.write.mode("overwrite").parquet(f"gs://{LAKEHOUSE_BUCKET_NAME}/froyo-raw/bronze/{DATA_ENTITY_NAME}")
+    df.write.mode("overwrite").parquet(destination_path)
 
-    print(f"Bronze layer ingestion of {DATA_ENTITY_NAME} complete.")
 
-except Exception as e:
-    print(f"An error occurred during Bronze layer ingestion for {DATA_ENTITY_NAME}: {e}")
-    raise
+def main():
+    """Main function to execute the bronze layer ingestion."""
+    if len(sys.argv) != 5:
+        raise Exception("Exactly 4 arguments are required: <project_id> <staging bucket> <lakehouse bucket> <data_entity_name>")
 
-finally:
-    spark.stop()
+    project_id = sys.argv[1]
+    staging_bucket_name = sys.argv[2]
+    lakehouse_bucket_name = sys.argv[3]
+    data_entity_name = sys.argv[4]
+
+    spark = None
+    try:
+        spark = SparkSession.builder \
+            .appName(f"Bronze Layer Ingestion for {data_entity_name}") \
+            .getOrCreate()
+
+        logging.info(f"Starting bronze layer ingestion of '{data_entity_name}'.")
+        ingest_to_bronze(spark, staging_bucket_name, lakehouse_bucket_name, data_entity_name)
+        logging.info(f"Successfully completed bronze layer ingestion of '{data_entity_name}'.")
+
+    except Exception as e:
+        logging.error(f"An error occurred during Bronze layer ingestion for {data_entity_name}: {e}", exc_info=True)
+        raise
+    finally:
+        if spark:
+            logging.info("Stopping Spark session.")
+            spark.stop()
+
+if __name__ == "__main__":
+    main()
