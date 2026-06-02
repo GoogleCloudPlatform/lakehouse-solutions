@@ -18,7 +18,6 @@ from pyspark.sql import SparkSession
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-
 def ingest_to_bronze(spark: SparkSession, staging_bucket_name: str, lakehouse_bucket_name: str, data_entity_name: str):
     """
     Loads data from a staging bucket and writes it to the bronze layer in a lakehouse bucket.
