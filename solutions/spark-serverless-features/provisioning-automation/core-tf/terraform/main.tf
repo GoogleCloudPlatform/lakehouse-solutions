@@ -455,11 +455,13 @@ resource "google_composer_environment" "cloud_composer_env_creation" {
   region    = local.location
   provider  = google-beta
   config {
+    environment_size = "ENVIRONMENT_SIZE_MEDIUM"
     software_config {
       image_version = local.CLOUD_COMPOSER3_IMG_VERSION 
       env_variables = {
         AIRFLOW_VAR_CODE_BUCKET = "${local.lakehouse_code_bucket}"
         AIRFLOW_VAR_PROJECT_ID = "${local.project_id}"
+        AIRFLOW_VAR_PROJECT_NUMBER = "${local.project_nbr}"
         AIRFLOW_VAR_REGION = "${local.location}"
         AIRFLOW_VAR_SUBNET = "${local.spark_subnet_nm}"
         AIRFLOW_VAR_BQ_DATASET = "${local.bq_dataset}"
