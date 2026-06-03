@@ -33,14 +33,14 @@ project_id = models.Variable.get("project_id")
 project_number = models.Variable.get("project_number")
 region = models.Variable.get("region")
 subnet=models.Variable.get("subnet")
-umsa=Variable.get("umsa")
-spark_runtime_version = Variable.get("spark_runtime_version")
-lrc_rest_api_version= Variable.get("lrc_rest_api_version")
+umsa=models.Variable.get("umsa")
+spark_runtime_version = models.Variable.get("spark_runtime_version")
+lrc_rest_api_version= models.Variable.get("lrc_rest_api_version")
 
 # Other varaiables
 dag_name= "froyo_analytics_pipeline"
 code_bucket=f"froyo-lab-code-bucket-{project_number}"
-staging_bucket=f"froyo-lakehouse-staging-{project_number}"
+staging_bucket_name=f"froyo-lakehouse-staging-{project_number}"
 lakehouse_bucket_name= f"froyo_iceberg_lakehouse_catalog_{project_number}"
 iceberg_catalog_name = f"froyo_iceberg_lakehouse_catalog_{project_number}"
 
@@ -59,41 +59,41 @@ random_suffix = ''.join(random.choices(string.digits, k = numDigits))
 
 # Spark configurations for the serverless Spark batches
 spark_properties = {
-  "spark.sql.adaptive.enabled": "true",
-  "spark.sql.adaptive.advisoryPartitionSizeInBytes": "128mb",
-  "spark.sql.adaptive.coalescePartitions.enabled": "true",
-  "spark.sql.defaultCatalog": "{iceberg_catalog_name}",
-  "spark.sql.catalog.{iceberg_catalog_name}": "org.apache.iceberg.spark.SparkCatalog",
-  "spark.sql.catalog.{iceberg_catalog_name}.type": "rest",
-  "spark.sql.catalog.{iceberg_catalog_name}.uri": "https://biglake.googleapis.com/iceberg/{lrc_rest_api_version}/restcatalog",
-  "spark.sql.catalog.{iceberg_catalog_name}.warehouse": "gs://{lakehouse_bucket_name}",
-  "spark.sql.catalog.{iceberg_catalog_name}.io-impl": "org.apache.iceberg.gcp.gcs.GCSFileIO",
-  "spark.sql.catalog.{iceberg_catalog_name}.header.x-goog-user-project": "{project_id}",
-  "spark.sql.catalog.{iceberg_catalog_name}.rest.auth.type": "org.apache.iceberg.gcp.auth.GoogleAuthManager",
-  "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
-  "spark.sql.catalog.{iceberg_catalog_name}.rest-metrics-reporting-enabled": "false",
-  "spark.dataproc.lineage.enabled": "true",
-  "spark.openlineage.transport.type": "gcplineage",
-  "spark.extraListeners": "io.openlineage.spark.agent.OpenLineageSparkListener",
-  "spark.sql.repl.eagerEval.enabled": "True",
-  "spark.openlineage.namespace": "froyo_spark_jobs"
+    "spark.sql.adaptive.enabled": "true",
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": "128mb",
+    "spark.sql.adaptive.coalescePartitions.enabled": "true",
+    f"spark.sql.defaultCatalog": iceberg_catalog_name,
+    f"spark.sql.catalog.{iceberg_catalog_name}": "org.apache.iceberg.spark.SparkCatalog",
+    f"spark.sql.catalog.{iceberg_catalog_name}.type": "rest",
+    f"spark.sql.catalog.{iceberg_catalog_name}.uri": f"https://biglake.googleapis.com/iceberg/{lrc_rest_api_version}/restcatalog",
+    f"spark.sql.catalog.{iceberg_catalog_name}.warehouse": f"gs://{lakehouse_bucket_name}",
+    f"spark.sql.catalog.{iceberg_catalog_name}.io-impl": "org.apache.iceberg.gcp.gcs.GCSFileIO",
+    f"spark.sql.catalog.{iceberg_catalog_name}.header.x-goog-user-project": project_id,
+    f"spark.sql.catalog.{iceberg_catalog_name}.rest.auth.type": "org.apache.iceberg.gcp.auth.GoogleAuthManager",
+    "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
+    f"spark.sql.catalog.{iceberg_catalog_name}.rest-metrics-reporting-enabled": "false",
+    "spark.dataproc.lineage.enabled": "true",
+    "spark.openlineage.transport.type": "gcplineage",
+    "spark.extraListeners": "io.openlineage.spark.agent.OpenLineageSparkListener",
+    "spark.sql.repl.eagerEval.enabled": "True",
+    "spark.openlineage.namespace": "froyo_spark_jobs"
 }
 
 BATCH_ID_PREFIX = "STUB-"+str(random_suffix)+"-af"
 
-def generate_batch_config(layer: str, data_entity: str):
+def generate_batch_config(layer: str, data_entity_name: str):
     '''
     This function generates the batch config for a given layer and data entity. It uses the individual script files in GCS as templates and replaces the placeholder values with the actual values for each data entity and layer.
     '''
-    if layer == "bronze" and data_entity in ["customers", "customers_sensitive", "products", "orders", "order_items", "regions"]:
+    if layer == "bronze" and data_entity_name in ["customers", "customers_sensitive", "products", "orders", "order_items", "regions"]:
         return {
             "pyspark_batch": {
                 "main_python_file_uri": bronze_layer_ingestion_script,
                 "args": [
                   project_id,
-                  staging_bucket,
-                  code_bucket,
-                  data_entity
+                  staging_bucket_name,
+                  lakehouse_bucket_name,
+                  data_entity_name
                 ]
             },
             "environment_config":{
@@ -108,7 +108,16 @@ def generate_batch_config(layer: str, data_entity: str):
                 "properties": spark_properties
             },
         }
-    # Add similar logic for other layers and data entities as needed
+    
+bronze_data_entities = [
+    "customers",
+    "customers_sensitive",
+    "products",
+    "orders",
+    "order_items",
+    "regions"
+]
+
 with models.DAG(
     dag_name,
     schedule_interval=None,
@@ -118,48 +127,19 @@ with models.DAG(
     start_task = EmptyOperator(task_id="start")
     end_task = EmptyOperator(task_id="end")
 
-    ingest_customer_master = DataprocCreateBatchOperator(
-        task_id="Ingest_Customer_Master",
-        project_id=project_id,
-        region=region,
-        batch=generate_batch_config("bronze", "customers"),
-        batch_id= BATCH_ID_PREFIX.replace("STUB", "ingest-b-cust"),
-    )
-    ingest_customer_sensitive = DataprocCreateBatchOperator(
-        task_id="Ingest_Customer_Sensitive",
-        project_id=project_id,
-        region=region,
-        batch=generate_batch_config("bronze", "customers_sensitive"),
-        batch_id= BATCH_ID_PREFIX.replace("STUB", "ingest-b-cust-alrgy"),
-    )
-    ingest_product_master = DataprocCreateBatchOperator(
-        task_id="Ingest_Product_Master",
-        project_id=project_id,
-        region=region,
-        batch=generate_batch_config("bronze", "products"),
-        batch_id= BATCH_ID_PREFIX.replace("STUB", "ingest-b-prod"),
-    )
-    ingest_orders = DataprocCreateBatchOperator(
-        task_id="Ingest_Orders",
-        project_id=project_id,
-        region=region,
-        batch=generate_batch_config("bronze", "orders"),
-        batch_id= BATCH_ID_PREFIX.replace("STUB", "ingest-b-orders"),
-    )
-    ingest_order_items = DataprocCreateBatchOperator(
-        task_id="Ingest_Order_Items",
-        project_id=project_id,
-        region=region,
-        batch=generate_batch_config("bronze", "order_items"),
-        batch_id= BATCH_ID_PREFIX.replace("STUB", "ingest-b-order-items"),
-    )
-    ingest_regions = DataprocCreateBatchOperator(
-        task_id="Ingest_Regions",
-        project_id=project_id,
-        region=region,
-        batch=generate_batch_config("bronze", "regions"),
-        batch_id= BATCH_ID_PREFIX.replace("STUB", "ingest-b-regions"),
-    )
+    bronze_ingestion_tasks = []
+    for data_entity_name in bronze_data_entities:
+        task_id = f"ingest_bronze_{data_entity_name}"
+        batch_id = f"{BATCH_ID_PREFIX}-bronze-{data_entity_name.replace('_', '-')}"
+        batch_config = generate_batch_config("bronze", data_entity_name)
 
+        task = DataprocCreateBatchOperator(
+            task_id=task_id,
+            project_id=project_id,
+            region=region,
+            batch=batch_config,
+            batch_id=batch_id,
+        )
+        bronze_ingestion_tasks.append(task)
 
-    start_task >> [ingest_customer_master, ingest_customer_sensitive,ingest_product_master , ingest_regions , ingest_orders , ingest_order_items ] >> end_task   
+    start_task >> bronze_ingestion_tasks >> end_task
