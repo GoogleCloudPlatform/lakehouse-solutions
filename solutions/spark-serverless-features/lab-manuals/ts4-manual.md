@@ -415,7 +415,7 @@ gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} 
 
 ## L5. Update Airflow environment variables 
 
-Update versions and also default worker concurrency. <br>
+Update versions as needed. <br>
 This takes a few minutes to complete.
 ```
 export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
