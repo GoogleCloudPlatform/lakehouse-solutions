@@ -57,11 +57,7 @@ platinum_layer_reporting_script= "gs://"+code_bucket+"/scripts/pyspark/platinum_
 num_digits_task_batch_id = 5  # number of digits in the random value.
 unique_task_batch_id_suffix = ''.join(random.choices(string.digits, k = num_digits_task_batch_id))
 
-DAG_RUN_ID_PREFIX = ""
-
-
-
-def generate_unique_task_batch_id(DAG_RUN_ID_PREFIX):
+def generate_unique_task_batch_id():
     return unique_task_batch_id_suffix
 
 # Spark configurations for the serverless Spark batches
@@ -181,7 +177,7 @@ with models.DAG(
     bronze_ingestion_parallel_tasks = []
     for data_entity_name in bronze_data_entities:
         task_id = f"ingest_bronze_{data_entity_name}"
-        batch_id =  f"af-{{{{ ts_nodash | lower }}}}-{{{{ try_number }}}}-" + generate_unique_task_batch_id()+  f"-bronze-{data_entity_name.replace('_', '-')}"
+        batch_id =  f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+  f"-bronze-{data_entity_name.replace('_', '-')}"
         batch_config = generate_batch_config("bronze", data_entity_name)
 
         task = DataprocCreateBatchOperator(
@@ -197,7 +193,7 @@ with models.DAG(
     silver_curation_parallel_tasks = []
     for data_entity_name in silver_data_entities:
         task_id = f"curate_silver_{data_entity_name}"
-        batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ try_number }}}}-" + generate_unique_task_batch_id()+ f"-silver-{data_entity_name.replace('_', '-')}"
+        batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+ f"-silver-{data_entity_name.replace('_', '-')}"
         batch_config = generate_batch_config("silver", data_entity_name)
     
         task = DataprocCreateBatchOperator(
@@ -211,7 +207,7 @@ with models.DAG(
 
     # This silver curation task for orders is created separately, as the orders curation logic needs to reference the curated products data in the silver layer. Hence, we cannot run the silver curation task for orders in parallel with the other silver curation tasks. We need to run it sequentially after the other silver curation tasks are done, which is what we achieve by setting up the dependencies in the end of this code.
     task_id = f"curate_silver_orders"
-    batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ try_number }}}}-" + generate_unique_task_batch_id()+  f"-silver-orders"
+    batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+  f"-silver-orders"
     batch_config = generate_batch_config("silver", "orders")
 
     silver_curation_order_task = DataprocCreateBatchOperator(
