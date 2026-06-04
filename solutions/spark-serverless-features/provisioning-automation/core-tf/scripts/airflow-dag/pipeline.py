@@ -55,7 +55,14 @@ platinum_layer_reporting_script= "gs://"+code_bucket+"/scripts/pyspark/platinum_
 
 # This is to add a random value to the serverless Spark batch ID that needs to be unique each run 
 num_digits_task_batch_id = 5  # number of digits in the random value.
-random_task_batch_id_suffix = ''.join(random.choices(string.digits, k = num_digits_task_batch_id))
+unique_task_batch_id_suffix = ''.join(random.choices(string.digits, k = num_digits_task_batch_id))
+
+DAG_RUN_ID_PREFIX = ""
+
+
+
+def generate_unique_task_batch_id(DAG_RUN_ID_PREFIX):
+    return unique_task_batch_id_suffix
 
 # Spark configurations for the serverless Spark batches
 spark_properties_with_iceberg_catalog = {
@@ -90,8 +97,7 @@ spark_properties_foundational = {
     "spark.openlineage.namespace": "froyo_spark_jobs"
 }
 
-DAG_RUN_ID_PREFIX = random.randint(1, 100)
-BATCH_ID_PREFIX = "af-"+str(DAG_RUN_ID_PREFIX)+"-"+str(random_task_batch_id_suffix)+"-"
+
 
 def generate_batch_config(layer: str, data_entity_name: str):
     '''
@@ -165,17 +171,17 @@ with models.DAG(
     start_date = days_ago(2),
     catchup=False,
 ) as dag_serverless_batch:
+
     start_task = EmptyOperator(task_id="start")
     end_task = EmptyOperator(task_id="end")
-    router = EmptyOperator(task_id="dependency_bridge")
+    bronze_to_silver_bridge = EmptyOperator(task_id="bronze_to_silver_bridge")
+    silver_to_gold_bridge = EmptyOperator(task_id="silver_to_gold_bridge")
 
+    # Generate the batch config and create tasks for the bronze layer ingestion jobs in a loop, one for each data entity. These tasks will run in parallel.
     bronze_ingestion_parallel_tasks = []
-    silver_curation_parallel_tasks = []
-
-
     for data_entity_name in bronze_data_entities:
         task_id = f"ingest_bronze_{data_entity_name}"
-        batch_id = f"{BATCH_ID_PREFIX}-bronze-{data_entity_name.replace('_', '-')}"
+        batch_id =  f"af-{{{{ ts_nodash | lower }}}}-{{{{ try_number }}}}-" + generate_unique_task_batch_id()+  f"-bronze-{data_entity_name.replace('_', '-')}"
         batch_config = generate_batch_config("bronze", data_entity_name)
 
         task = DataprocCreateBatchOperator(
@@ -187,11 +193,13 @@ with models.DAG(
         )
         bronze_ingestion_parallel_tasks.append(task)
 
+    # Generate the batch config and create tasks for the silver layer curation jobs in a loop, one for each data entity. These tasks will run in parallel.
+    silver_curation_parallel_tasks = []
     for data_entity_name in silver_data_entities:
-        task_id = f"curation_silver_{data_entity_name}"
-        batch_id = f"{BATCH_ID_PREFIX}-silver-{data_entity_name.replace('_', '-')}"
+        task_id = f"curate_silver_{data_entity_name}"
+        batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ try_number }}}}-" + generate_unique_task_batch_id()+ f"-silver-{data_entity_name.replace('_', '-')}"
         batch_config = generate_batch_config("silver", data_entity_name)
-
+    
         task = DataprocCreateBatchOperator(
             task_id=task_id,
             project_id=project_id,
@@ -201,8 +209,9 @@ with models.DAG(
         )
         silver_curation_parallel_tasks.append(task)
 
-    task_id = f"curation_silver_orders"
-    batch_id = f"{BATCH_ID_PREFIX}-silver-orders"
+    # This silver curation task for orders is created separately, as the orders curation logic needs to reference the curated products data in the silver layer. Hence, we cannot run the silver curation task for orders in parallel with the other silver curation tasks. We need to run it sequentially after the other silver curation tasks are done, which is what we achieve by setting up the dependencies in the end of this code.
+    task_id = f"curate_silver_orders"
+    batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ try_number }}}}-" + generate_unique_task_batch_id()+  f"-silver-orders"
     batch_config = generate_batch_config("silver", "orders")
 
     silver_curation_order_task = DataprocCreateBatchOperator(
@@ -212,6 +221,5 @@ with models.DAG(
         batch=batch_config,
         batch_id=batch_id,
     )
-    
 
-    start_task >> bronze_ingestion_parallel_tasks >> router >> silver_curation_parallel_tasks >> silver_curation_order_task >> end_task
+    start_task >> bronze_ingestion_parallel_tasks >> bronze_to_silver_bridge >> silver_curation_parallel_tasks >> silver_curation_order_task >> end_task
