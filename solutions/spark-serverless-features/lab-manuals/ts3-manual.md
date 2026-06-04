@@ -345,6 +345,7 @@ DEPLOYER_ACCOUNT_NAME=$GCP_ACCOUNT_NAME
 ORG_ID=`gcloud organizations list --format="value(name)"`
 S8S_SPARK_RUNTIME_VERSION="2.3"
 MANAGED_AIRFLOW_SERVICE_VERSION="composer-3-airflow-2.11.1-build.6"
+LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION="v1beta"
 
 ```
 
@@ -361,6 +362,7 @@ terraform apply \
   -var="spark_runtime_version=${S8S_SPARK_RUNTIME_VERSION}" \
   -var="gcp_region=${GCP_REGION}" \
   -var="cloud_composer_image_version=$MANAGED_AIRFLOW_SERVICE_VERSION" \
+  -var="lrc_rest_api_version=$LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION" \
   -auto-approve >> spark-serverless-features-tf-core.output
   
 ```
