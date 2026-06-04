@@ -95,11 +95,11 @@ spark_properties_foundational = {
 
 
 
-def generate_batch_config(layer: str, data_entity_name: str):
+def generate_batch_config(layer: str, entity_name: str):
     '''
     This function generates the batch config for a given layer and data entity. It uses the individual script files in GCS as templates and replaces the placeholder values with the actual values for each data entity and layer.
     '''
-    if layer == "bronze" and data_entity_name in ["customers", "customers_sensitive", "products", "orders", "order_items", "regions"]:
+    if layer == "bronze" and entity_name in ["customers", "customers_sensitive", "products", "orders", "order_items", "regions"]:
         return {
             "pyspark_batch": {
                 "main_python_file_uri": bronze_layer_ingestion_script,
@@ -107,7 +107,7 @@ def generate_batch_config(layer: str, data_entity_name: str):
                   project_id,
                   staging_bucket_name,
                   lakehouse_bucket_name,
-                  data_entity_name
+                  entity_name
                 ]
             },
             "environment_config":{
@@ -122,7 +122,7 @@ def generate_batch_config(layer: str, data_entity_name: str):
                 "properties": spark_properties_foundational
             },
         }
-    elif layer == "silver" and data_entity_name in ["customers", "customers_sensitive", "products", "orders"]:
+    elif layer == "silver" and entity_name in ["customers", "customers_sensitive", "products", "orders"]:
         return {
             "pyspark_batch": {
                 "main_python_file_uri": silver_layer_curation_script,
@@ -130,7 +130,7 @@ def generate_batch_config(layer: str, data_entity_name: str):
                   project_id,
                   staging_bucket_name,
                   lakehouse_bucket_name,
-                  data_entity_name
+                  entity_name
                 ]
             },
             "environment_config":{
@@ -145,6 +145,45 @@ def generate_batch_config(layer: str, data_entity_name: str):
                 "properties": spark_properties_with_iceberg_catalog
             },
         }
+    elif layer == "gold" and entity_name in ["orders"]:
+        return {
+            "pyspark_batch": {
+                "main_python_file_uri": gold_layer_aggregation_script,
+                "args": []
+            },
+            "environment_config":{
+                "execution_config":{
+                    "service_account": service_account_id,
+                    "subnetwork_uri": subnet
+                }, 
+            },
+            "runtime_config": {
+                "version": spark_runtime_version,
+                "properties": spark_properties_with_iceberg_catalog
+            },
+        }
+    elif layer == "platinum" and entity_name in ["REVENUE_BY_MONTH","AVERAGE_ORDER_VALUE", "TOP_TEN_PRODUCTS", "CUSTOMER_SEGMENTATION"]:
+        return {
+            "pyspark_batch": {
+                "main_python_file_uri": platinum_layer_reporting_script,
+                "args": [
+                    entity_name
+                ]
+            },
+            "environment_config":{
+                "execution_config":{
+                    "service_account": service_account_id,
+                    "subnetwork_uri": subnet
+                },
+                
+            },
+            "runtime_config": {
+                "version": spark_runtime_version,
+                "properties": spark_properties_with_iceberg_catalog
+            },
+        }
+    else:
+        raise ValueError(f"Invalid layer {layer} or data entity {data_entity_name}")
     
 bronze_data_entities = [
     "customers",
@@ -161,6 +200,14 @@ silver_data_entities = [
     "products",
 ]
 
+platinum_reporting_entities = [
+    "REVENUE_BY_MONTH",
+    "AVERAGE_ORDER_VALUE",
+    "TOP_TEN_PRODUCTS",
+    "CUSTOMER_SEGMENTATION"
+]
+
+
 with models.DAG(
     dag_name,
     schedule_interval=None,
@@ -171,7 +218,6 @@ with models.DAG(
     start_task = EmptyOperator(task_id="start")
     end_task = EmptyOperator(task_id="end")
     bronze_to_silver_bridge = EmptyOperator(task_id="bronze_to_silver_bridge")
-    silver_to_gold_bridge = EmptyOperator(task_id="silver_to_gold_bridge")
 
     # Generate the batch config and create tasks for the bronze layer ingestion jobs in a loop, one for each data entity. These tasks will run in parallel.
     bronze_ingestion_parallel_tasks = []
@@ -218,4 +264,33 @@ with models.DAG(
         batch_id=batch_id,
     )
 
-    start_task >> bronze_ingestion_parallel_tasks >> bronze_to_silver_bridge >> silver_curation_parallel_tasks >> silver_curation_order_task >> end_task
+    # Generate the batch config and create task for the gold layer aggregation job
+    task_id = f"aggregate_gold_orders"
+    batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+  f"-gold-orders"
+    batch_config = generate_batch_config("gold", "orders")
+
+    gold_aggregation_order_task = DataprocCreateBatchOperator(
+        task_id=task_id,
+        project_id=project_id,
+        region=region,
+        batch=batch_config,
+        batch_id=batch_id,
+    )
+
+    platinum_reporting_parallel_tasks = []
+    for entity_name in platinum_reporting_entities:
+        task_id = f"run_platinum_rpt_{entity_name.lower()}"
+        batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+ f"-platinum-{entity_name.lower().replace('_', '-')}"
+        batch_config = generate_batch_config("platinum", entity_name)
+    
+        task = DataprocCreateBatchOperator(
+            task_id=task_id,
+            project_id=project_id,
+            region=region,
+            batch=batch_config,
+            batch_id=batch_id,
+        )
+        platinum_reporting_parallel_tasks.append(task)
+
+
+    start_task >> bronze_ingestion_parallel_tasks >> bronze_to_silver_bridge >> silver_curation_parallel_tasks >> silver_curation_order_task >> gold_aggregation_order_task >> platinum_reporting_parallel_tasks >> end_task
