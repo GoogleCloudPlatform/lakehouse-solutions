@@ -413,8 +413,9 @@ gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} 
 
 <hr>
 
-## L5. Update Airflow environment variables
+## L5. Update Airflow environment variables and configurations
 
+Update versions and also default worker concurrency. <br>
 This takes a few minutes to complete.
 ```
 export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
@@ -426,7 +427,8 @@ export LRC_REST_API_VERSION="v1beta"
 
 gcloud composer environments update froyo-lab-cc3 \
     --location $REGION \
-    --update-env-variables=AIRFLOW_VAR_SPARK_RUNTIME_VERSION=$SPARK_RUNTIME_VERSION,AIRFLOW_VAR_PROJECT_NUMBER=$PROJECT_NBR,AIRFLOW_VAR_LRC_REST_API_VERSION=$LRC_REST_API_VERSION
+    --update-env-variables=AIRFLOW_VAR_SPARK_RUNTIME_VERSION=$SPARK_RUNTIME_VERSION,AIRFLOW_VAR_PROJECT_NUMBER=$PROJECT_NBR,AIRFLOW_VAR_LRC_REST_API_VERSION=$LRC_REST_API_VERSION \
+    --update-airflow-configs="celery-worker_concurrency=6"
 
 
 ```
