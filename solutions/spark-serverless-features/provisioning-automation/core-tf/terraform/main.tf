@@ -455,7 +455,6 @@ resource "google_composer_environment" "cloud_composer_env_creation" {
   region    = local.location
   provider  = google-beta
   config {
-    environment_size = "ENVIRONMENT_SIZE_MEDIUM"
     software_config {
       image_version = local.CLOUD_COMPOSER3_IMG_VERSION 
       env_variables = {
@@ -469,6 +468,24 @@ resource "google_composer_environment" "cloud_composer_env_creation" {
         AIRFLOW_VAR_SPARK_RUNTIME_VERSION = "${local.S8S_SPARK_RUNTIME_VERSION}"
       }
       
+    }
+    workloads_config {
+      scheduler {
+        count      = 2
+        cpu        = 2
+        memory_gb  = 4
+        storage_gb = 5
+      }
+      dag_processor {
+        count      = 1
+        cpu        = 2
+        memory_gb  = 4
+        storage_gb = 2
+      }
+      worker {
+        min_count = 3
+        max_count = 6
+      }
     }
     node_config {
         network    = local.vpc_nm
