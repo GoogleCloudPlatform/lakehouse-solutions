@@ -58,10 +58,6 @@ def main():
     except Exception as e:
         logging.error(f"An error occurred during Bronze layer ingestion for {data_entity_name}: {e}", exc_info=True)
         raise
-    finally:
-        if spark:
-            logging.info("Stopping Spark session.")
-            spark.stop()
 
 if __name__ == "__main__":
     main()

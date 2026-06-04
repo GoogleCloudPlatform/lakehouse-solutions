@@ -54,11 +54,11 @@ gold_layer_aggregation_script= "gs://"+code_bucket+"/scripts/pyspark/gold_layer_
 platinum_layer_reporting_script= "gs://"+code_bucket+"/scripts/pyspark/platinum_layer_reporting.py"
 
 # This is to add a random value to the serverless Spark batch ID that needs to be unique each run 
-numDigits = 5  # number of digits in the random value.
-random_suffix = ''.join(random.choices(string.digits, k = numDigits))
+num_digits_task_batch_id = 5  # number of digits in the random value.
+random_task_batch_id_suffix = ''.join(random.choices(string.digits, k = num_digits_task_batch_id))
 
 # Spark configurations for the serverless Spark batches
-spark_properties = {
+spark_properties_with_iceberg_catalog = {
     "spark.sql.adaptive.enabled": "true",
     "spark.sql.adaptive.advisoryPartitionSizeInBytes": "128mb",
     "spark.sql.adaptive.coalescePartitions.enabled": "true",
@@ -79,7 +79,19 @@ spark_properties = {
     "spark.openlineage.namespace": "froyo_spark_jobs"
 }
 
-BATCH_ID_PREFIX = "STUB-"+str(random_suffix)+"-af"
+spark_properties_foundational = {
+    "spark.sql.adaptive.enabled": "true",
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": "128mb",
+    "spark.sql.adaptive.coalescePartitions.enabled": "true",
+    "spark.dataproc.lineage.enabled": "true",
+    "spark.openlineage.transport.type": "gcplineage",
+    "spark.extraListeners": "io.openlineage.spark.agent.OpenLineageSparkListener",
+    "spark.sql.repl.eagerEval.enabled": "True",
+    "spark.openlineage.namespace": "froyo_spark_jobs"
+}
+
+DAG_RUN_ID_PREFIX = random.randint(1, 100)
+BATCH_ID_PREFIX = "af-"+str(DAG_RUN_ID_PREFIX)+"-"+str(random_task_batch_id_suffix)+"-"
 
 def generate_batch_config(layer: str, data_entity_name: str):
     '''
@@ -105,7 +117,30 @@ def generate_batch_config(layer: str, data_entity_name: str):
             },
             "runtime_config": {
                 "version": spark_runtime_version,
-                "properties": spark_properties
+                "properties": spark_properties_foundational
+            },
+        }
+    elif layer == "silver" and data_entity_name in ["customers", "customers_sensitive", "products", "orders"]:
+        return {
+            "pyspark_batch": {
+                "main_python_file_uri": silver_layer_curation_script,
+                "args": [
+                  project_id,
+                  staging_bucket_name,
+                  lakehouse_bucket_name,
+                  data_entity_name
+                ]
+            },
+            "environment_config":{
+                "execution_config":{
+                    "service_account": service_account_id,
+                    "subnetwork_uri": subnet
+                },
+                
+            },
+            "runtime_config": {
+                "version": spark_runtime_version,
+                "properties": spark_properties_with_iceberg_catalog
             },
         }
     
@@ -118,6 +153,12 @@ bronze_data_entities = [
     "regions"
 ]
 
+silver_data_entities = [
+    "customers",
+    "customers_sensitive",
+    "products",
+]
+
 with models.DAG(
     dag_name,
     schedule_interval=None,
@@ -126,8 +167,12 @@ with models.DAG(
 ) as dag_serverless_batch:
     start_task = EmptyOperator(task_id="start")
     end_task = EmptyOperator(task_id="end")
+    router = EmptyOperator(task_id="dependency_bridge")
 
-    bronze_ingestion_tasks = []
+    bronze_ingestion_parallel_tasks = []
+    silver_curation_parallel_tasks = []
+
+
     for data_entity_name in bronze_data_entities:
         task_id = f"ingest_bronze_{data_entity_name}"
         batch_id = f"{BATCH_ID_PREFIX}-bronze-{data_entity_name.replace('_', '-')}"
@@ -140,6 +185,33 @@ with models.DAG(
             batch=batch_config,
             batch_id=batch_id,
         )
-        bronze_ingestion_tasks.append(task)
+        bronze_ingestion_parallel_tasks.append(task)
 
-    start_task >> bronze_ingestion_tasks >> end_task
+    for data_entity_name in silver_data_entities:
+        task_id = f"curation_silver_{data_entity_name}"
+        batch_id = f"{BATCH_ID_PREFIX}-silver-{data_entity_name.replace('_', '-')}"
+        batch_config = generate_batch_config("silver", data_entity_name)
+
+        task = DataprocCreateBatchOperator(
+            task_id=task_id,
+            project_id=project_id,
+            region=region,
+            batch=batch_config,
+            batch_id=batch_id,
+        )
+        silver_curation_parallel_tasks.append(task)
+
+    task_id = f"curation_silver_orders"
+    batch_id = f"{BATCH_ID_PREFIX}-silver-orders"
+    batch_config = generate_batch_config("silver", "orders")
+
+    silver_curation_order_task = DataprocCreateBatchOperator(
+        task_id=task_id,
+        project_id=project_id,
+        region=region,
+        batch=batch_config,
+        batch_id=batch_id,
+    )
+    
+
+    start_task >> bronze_ingestion_parallel_tasks >> router >> silver_curation_parallel_tasks >> silver_curation_order_task >> end_task
