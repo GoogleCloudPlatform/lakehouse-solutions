@@ -361,7 +361,7 @@ terraform apply \
   -var="org_id=${ORG_ID}" \
   -var="spark_runtime_version=${S8S_SPARK_RUNTIME_VERSION}" \
   -var="gcp_region=${GCP_REGION}" \
-  -var="cloud_composer_image_version=$MANAGED_AIRFLOW_SERVICE_VERSION" \
+  -var="managed_airflow_image_version=$MANAGED_AIRFLOW_SERVICE_VERSION" \
   -var="lrc_rest_api_version=$LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION" \
   -auto-approve >> spark-serverless-features-tf-core.output
   
