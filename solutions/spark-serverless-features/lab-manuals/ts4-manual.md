@@ -22,7 +22,9 @@ limitations under the License.*
 ## 1.0. About the lab
 
 ### 1.1. Abstract
-This lab is **introductory** in nature and showcases orchestration of Apache Spark applications on Google Cloud Platform on the managed product - **Serverless Managed Service for Apache Spark**, with the serverless managed **Lakehouse runtime catalog** as the lakehouse Iceberg metastore on **Managed Service for Apache Airflow**. The goal of the lab is to demystify **Managed Servive for Apache Airflow** for lakehouse pipelines through a (zero fluff, zero dazzle) minimum viable end to end example of frozen yogurt (froyo) retail sales analysis to accelerate adoption. This lab builds on the lab in the previous module and operationalizes the froyo analytics medallion architecture in lab Spark notebook as a pipeline of serverless Spark batch jobs showcasing the development continuum. This hands-on lab complements the blog post [Lakehouse Demystified - Part 5: Just enough about Managed Service for Apache Airflow](TODO).
+This lab is **introductory** in nature and showcases orchestration of Apache Spark applications on Google Cloud Platform on the managed product - **Serverless Managed Service for Apache Spark**, with the serverless managed **Lakehouse runtime catalog** as the lakehouse Iceberg metastore on **Managed Service for Apache Airflow**. 
+
+The goal of the lab is to demystify **Managed Servive for Apache Airflow** for lakehouse pipelines through a (zero fluff, zero dazzle) minimum viable end to end example of frozen yogurt (froyo) retail sales analysis to accelerate adoption. This lab builds on the lab in the previous module and operationalizes the froyo analytics medallion architecture in lab Spark notebook as a pipeline of serverless Spark batch jobs showcasing the development continuum. This hands-on lab complements the blog post [Lakehouse Demystified - Part 5: Just enough about Managed Service for Apache Airflow](TODO).
 
 |  |  | 
 | -- | :--- | 
