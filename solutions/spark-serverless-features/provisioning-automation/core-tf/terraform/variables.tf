@@ -38,9 +38,9 @@ variable "deployment_service_account_name" {
 variable "org_id" {
  description = "Organization ID in which project created"
 }
-variable "cloud_composer_image_version" {
- description = "Version of Cloud Composer 3 image to use"
- default     = "composer-3-airflow-2.10.5-build.29"
+variable "managed_airflow_image_version" {
+ description = "Version of Managed Airflow 3 image to use"
+ default     = "composer-3-airflow-2.11.1-build.6"
 }
 variable "gcp_region" {
  description = "The GCP region you want to use"
@@ -50,5 +50,10 @@ variable "gcp_region" {
 variable "spark_runtime_version" {
   description = "The runtime version for Managed Service for Apache Spark - Serverless"
   default     = "2.3"
+}
+
+variable "lrc_rest_api_version" {
+  description = "The version for Iceberg REST catalog"
+  default     = "v1beta"
 }
 

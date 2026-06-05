@@ -35,12 +35,13 @@ spark_subnet_cidr                   = "10.2.0.0/16"
 bq_dataset                          = "froyo_ds"
 CC_GMSA_FQN                         = "service-${local.project_nbr}@cloudcomposer-accounts.iam.gserviceaccount.com"
 GCE_GMSA_FQN                        = "${local.project_nbr}-compute@developer.gserviceaccount.com"
-CLOUD_COMPOSER3_IMG_VERSION         = "${var.cloud_composer_image_version}"
+MANAGED_AIRFLOW_IMG_VERSION         = "${var.managed_airflow_image_version}"
 S8S_SPARK_RUNTIME_VERSION           = "${var.spark_runtime_version}"
 lakehouse_staging_bucket            = "froyo-lakehouse-staging-${local.project_nbr}"
 lakehouse_hive_catalog_name         = "froyo_hive_lakehouse_catalog_${local.project_nbr}"
 lakehouse_iceberg_catalog_name      = "froyo_iceberg_lakehouse_catalog_${local.project_nbr}"
 lakehouse_code_bucket               = "${local.solution_prefix}-code-bucket-${local.project_nbr}"
+LRC_REST_API_VERSION                = "${var.lrc_rest_api_version}"
 }
 
 /******************************************
@@ -446,27 +447,51 @@ resource "google_bigquery_dataset" "bq_dataset_creation" {
 }
 
 /******************************************
-10. Cloud Composer 3 creation
+10. Managed Airflow Service/Cloud Composer 3 creation
 ******************************************/
 
-resource "google_composer_environment" "cloud_composer_env_creation" {
+resource "google_composer_environment" "managed_airflow_env_creation" {
   project   = local.project_id
   name      = "${local.solution_prefix}-cc3"
   region    = local.location
   provider  = google-beta
   config {
     software_config {
-      image_version = local.CLOUD_COMPOSER3_IMG_VERSION 
+      image_version = local.MANAGED_AIRFLOW_IMG_VERSION 
       env_variables = {
         AIRFLOW_VAR_CODE_BUCKET = "${local.lakehouse_code_bucket}"
         AIRFLOW_VAR_PROJECT_ID = "${local.project_id}"
+        AIRFLOW_VAR_PROJECT_NUMBER = "${local.project_nbr}"
         AIRFLOW_VAR_REGION = "${local.location}"
         AIRFLOW_VAR_SUBNET = "${local.spark_subnet_nm}"
         AIRFLOW_VAR_BQ_DATASET = "${local.bq_dataset}"
         AIRFLOW_VAR_UMSA = "${local.umsa}"
         AIRFLOW_VAR_SPARK_RUNTIME_VERSION = "${local.S8S_SPARK_RUNTIME_VERSION}"
+        AIRFLOW_VAR_LRC_REST_API_VERSION = "${local.LRC_REST_API_VERSION}"
+        
       }
       
+    }
+    workloads_config {
+      scheduler {
+        count      = 2
+        cpu        = 2
+        memory_gb  = 4
+        storage_gb = 5
+      }
+      dag_processor {
+        count      = 1
+        cpu        = 2
+        memory_gb  = 4
+        storage_gb = 2
+      }
+      worker {
+        min_count = 3
+        max_count = 6
+        cpu        = 2
+        memory_gb  = 4
+        storage_gb = 10
+      }
     }
     node_config {
         network    = local.vpc_nm
@@ -488,10 +513,10 @@ resource "google_composer_environment" "cloud_composer_env_creation" {
 Introducing sleep to minimize errors from
 dependencies having not completed
 ********************************************/
-resource "time_sleep" "sleep_after_composer_creation" {
+resource "time_sleep" "sleep_after_airflow_environment_creation" {
   create_duration = "180s"
   depends_on = [
-      google_composer_environment.cloud_composer_env_creation
+      google_composer_environment.managed_airflow_env_creation
   ]
 }
 
@@ -502,9 +527,9 @@ Apache Airflow DAG bucket
 resource "google_storage_bucket_object" "upload_cc_dag_to_airflow_dag_bucket" {
   name   = "dags/pipeline.py"
   source = "../scripts/airflow-dag/pipeline.py"
-  bucket = substr(substr(google_composer_environment.cloud_composer_env_creation.config.0.dag_gcs_prefix, 5, length(google_composer_environment.cloud_composer_env_creation.config.0.dag_gcs_prefix)), 0, (length(google_composer_environment.cloud_composer_env_creation.config.0.dag_gcs_prefix)-10))
+  bucket = substr(substr(google_composer_environment.managed_airflow_env_creation.config.0.dag_gcs_prefix, 5, length(google_composer_environment.managed_airflow_env_creation.config.0.dag_gcs_prefix)), 0, (length(google_composer_environment.managed_airflow_env_creation.config.0.dag_gcs_prefix)-10))
   depends_on = [
-    time_sleep.sleep_after_composer_creation
+    time_sleep.sleep_after_airflow_environment_creation
   ]
 }
 
@@ -580,7 +605,7 @@ output "CODE_BUCKET" {
 }
 
 output "CLOUD_COMPOSER_DAG_BUCKET" {
-  value = substr(substr(google_composer_environment.cloud_composer_env_creation.config.0.dag_gcs_prefix, 5, length(google_composer_environment.cloud_composer_env_creation.config.0.dag_gcs_prefix)), 0, (length(google_composer_environment.cloud_composer_env_creation.config.0.dag_gcs_prefix)-10))
+  value = substr(substr(google_composer_environment.managed_airflow_env_creation.config.0.dag_gcs_prefix, 5, length(google_composer_environment.managed_airflow_env_creation.config.0.dag_gcs_prefix)), 0, (length(google_composer_environment.managed_airflow_env_creation.config.0.dag_gcs_prefix)-10))
 }
 
 output "LAKEHOUSE_ICEBERG_CATALOG_NAME" {
