@@ -611,7 +611,7 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 ![README](../images/ts4-l5-2-16-5.png)   
 <br><br>
 
-![README](../images/ts4-l52--16-6.png)   
+![README](../images/ts4-l52-2-16-6.png)   
 <br><br>
 
 
