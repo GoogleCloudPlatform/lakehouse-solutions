@@ -418,7 +418,7 @@ gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} 
 ### L5.1. Navigate to Managed Service for Apache Airflow
 Search for Airflow in the [cloud console](https://console.cloud.google.com)
 
-![README](../images/ts5-l5-1.png)   
+![README](../images/ts4-l5-1.png)   
 <br><br>
 
 ### L5.2. Study the Airflow environment
@@ -427,10 +427,10 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L5.2.1. Review the environment configuration tab
 
-![README](../images/ts5-l5-2-1-1.png)   
+![README](../images/ts4-l5-2-1-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-1-2.png)   
+![README](../images/ts4-l5-2-1-2.png)   
 <br><br>
 
 <hr>
@@ -438,14 +438,14 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L5.2.2. Review the Airflow configuration overrides tab
 
-![README](../images/ts5-l5-2-2.png)   
+![README](../images/ts4-l5-2-2.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.3. Review the environment variables tab
 
-![README](../images/ts5-l5-2-3.png)   
+![README](../images/ts4-l5-2-3.png)   
 <br><br>
 
 <hr>
@@ -453,7 +453,7 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L5.2.4. Review the labels tab
 
-![README](../images/ts5-l5-2-4.png)   
+![README](../images/ts4-l5-2-4.png)   
 <br><br>
 
 <hr>
@@ -461,7 +461,7 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L52..5. Review the Pypi packages tab
 
-![README](../images/ts5-l5-2-5.png)   
+![README](../images/ts4-l5-2-5.png)   
 <br><br>
 
 <hr>
@@ -469,13 +469,13 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L5.2.6. Review the monitoring tab - overview
 
-![README](../images/ts5-l5-2-6-1.png)   
+![README](../images/ts4-l5-2-6-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-6-2.png)   
+![README](../images/ts4-l5-2-6-2.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-6-3.png)   
+![README](../images/ts4-l5-2-6-3.png)   
 <br><br>
 
 <hr>
@@ -483,104 +483,104 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L5.2.7. Review the monitoring tab - DAG statistics
 
-![README](../images/ts5-l5-2-7-1.png)   
+![README](../images/ts4-l5-2-7-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-7-2.png)   
+![README](../images/ts4-l5-2-7-2.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-7-3.png)   
+![README](../images/ts4-l5-2-7-3.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.8. Review the monitoring tab - schedulers
 
-![README](../images/ts5-l5-2-8-1.png)   
+![README](../images/ts4-l5-2-8-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-8-2.png)   
+![README](../images/ts4-l5-2-8-2.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-8-3.png)   
+![README](../images/ts4-l5-2-8-3.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.9. Review the monitoring tab - DAG processors
 
-![README](../images/ts5-l5-2-9-1.png)   
+![README](../images/ts4-l5-2-9-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-9-2.png)   
+![README](../images/ts4-l5-2-9-2.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.10. Review the monitoring tab - workers
 
-![README](../images/ts5-l5-2-10-1.png)   
+![README](../images/ts4-l5-2-10-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-10-2.png)   
+![README](../images/ts4-l5-2-10-2.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-10-3.png)   
+![README](../images/ts4-l5-2-10-3.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-10-4.png)   
+![README](../images/ts4-l5-2-10-4.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-10-5.png)   
+![README](../images/ts4-l5-2-10-5.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.11. Review the monitoring tab - triggerers
 
-![README](../images/ts5-l5-2-11-1.png)   
+![README](../images/ts4-l5-2-11-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-11-2.png)   
+![README](../images/ts4-l5-2-11-2.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-11-3.png)   
+![README](../images/ts4-l5-2-11-3.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-11-4.png)   
+![README](../images/ts4-l5-2-11-4.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-11-5.png)   
+![README](../images/ts4-l5-2-11-5.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-11-6.png)   
+![README](../images/ts4-l5-2-11-6.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.12. Review the monitoring tab - webserver
 
-![README](../images/ts5-l5-2-12-1.png)   
+![README](../images/ts4-l5-2-12-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-12-2.png)   
+![README](../images/ts4-l5-2-12-2.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.13. Review the monitoring tab - SQL database
 
-![README](../images/ts5-l5-2-13-1.png)   
+![README](../images/ts4-l5-2-13-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-13-2.png)   
+![README](../images/ts4-l5-2-13-2.png)   
 <br><br>
 
 <hr>
 
 #### L5.2.14. Review the monitoring tab - SQL database
 
-![README](../images/ts5-l5-2-14-1.png)   
+![README](../images/ts4-l5-2-14-1.png)   
 <br><br>
 
 
@@ -588,7 +588,7 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L5.2.15. Review the monitoring tab - logs
 
-![README](../images/ts5-l5-2-15-1.png)   
+![README](../images/ts4-l5-2-15-1.png)   
 <br><br>
 
 
@@ -596,22 +596,22 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 
 #### L5.2.16. Review the monitoring tab - DAGs
 
-![README](../images/ts5-l5-2-16-1.png)   
+![README](../images/ts4-l5-2-16-1.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-16-2.png)   
+![README](../images/ts4-l5-2-16-2.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-16-3.png)   
+![README](../images/ts4-l5-2-16-3.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-16-4.png)   
+![README](../images/ts4-l5-2-16-4.png)   
 <br><br>
 
-![README](../images/ts5-l5-2-16-5.png)   
+![README](../images/ts4-l5-2-16-5.png)   
 <br><br>
 
-![README](../images/ts5-l52--16-6.png)   
+![README](../images/ts4-l52--16-6.png)   
 <br><br>
 
 
