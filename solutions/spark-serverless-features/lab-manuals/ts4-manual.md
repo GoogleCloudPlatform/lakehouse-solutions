@@ -5,7 +5,7 @@
 
 # LAB
 
-## L1. Test the Pyspark scripts for bronze layer ingestion
+## L1. [Optional] Run the Pyspark scripts for bronze layer ingestion 
 
 ### L1.1. Variables
 
@@ -160,7 +160,7 @@ gcloud dataproc batches submit pyspark ${BRONZE_LAYER_PROCESSING_SCRIPT_PATH} \
 <hr>
 
 
-## L2. Test the Pyspark scripts for silver layer curation
+## L2. [Optional] Run the Pyspark scripts for silver layer curation
 
 ### L2.1. Variables
 
@@ -276,7 +276,7 @@ gcloud dataproc batches submit pyspark ${SILVER_LAYER_PROCESSING_SCRIPT_PATH} \
 
 <hr>
 
-## L3. Test the Pyspark scripts for gold layer aggregation
+## L3. [Optional] Run the Pyspark scripts for gold layer aggregation
 
 ### L3.1. Variables
 
@@ -317,7 +317,7 @@ gcloud dataproc batches submit pyspark ${GOLD_LAYER_PROCESSING_SCRIPT_PATH} \
 
 <hr>
 
-## L4. Test the Pyspark scripts for platinum layer reporting
+## L4. [Optional] Run the Pyspark scripts for platinum layer reporting
 
 ### L4.1. Variables
 
@@ -413,21 +413,176 @@ gcloud dataproc batches submit pyspark ${PLATINUM_LAYER_PROCESSING_SCRIPT_PATH} 
 
 <hr>
 
-## L5. Update Airflow environment variables 
+## L5. Run the DAG in Managed Servive for Apache Airflow
 
-Update versions as needed. <br>
-This takes a few minutes to complete.
-```
-export PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
-export PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
-export REGION="us-central1"
-export SPARK_RUNTIME_VERSION="3.0"
-export LRC_REST_API_VERSION="v1beta"
+### L5.1. Navigate to Managed Service for Apache Airflow
+Search for Airflow in the [cloud console](https://console.cloud.google.com)
+
+![README](../images/ts5-l5-1.png)   
+<br><br>
+
+### L5.2. Study the Airflow environment
+
+Click on the various tabs to familairize yourself with the UI and the environment specs automatically created for you via Terraform in technical solution 3.
+
+#### L5.2.1. Review the environment configuration tab
+
+![README](../images/ts5-l5-2-1-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-2-1-2.png)   
+<br><br>
+
+<hr>
 
 
-gcloud composer environments update froyo-lab-cc3 \
-    --location $REGION \
-    --update-env-variables=AIRFLOW_VAR_SPARK_RUNTIME_VERSION=$SPARK_RUNTIME_VERSION,AIRFLOW_VAR_PROJECT_NUMBER=$PROJECT_NBR,AIRFLOW_VAR_LRC_REST_API_VERSION=$LRC_REST_API_VERSION 
+#### L5.2. Review the Airflow configuration overrides tab
+
+![README](../images/ts5-l5-2-2.png)   
+<br><br>
+
+<hr>
+
+#### L5.3. Review the environment variables tab
+
+![README](../images/ts5-l5-3.png)   
+<br><br>
+
+<hr>
 
 
-```
+#### L5.4. Review the labels tab
+
+![README](../images/ts5-l5-4.png)   
+<br><br>
+
+<hr>
+
+
+#### L5.5. Review the Pypi packages tab
+
+![README](../images/ts5-l5-5.png)   
+<br><br>
+
+<hr>
+
+
+#### L5.6. Review the monitoring tab - overview
+
+![README](../images/ts5-l5-6-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-6-2.png)   
+<br><br>
+
+![README](../images/ts5-l5-6-3.png)   
+<br><br>
+
+<hr>
+
+
+#### L5.7. Review the monitoring tab - DAG statistics
+
+![README](../images/ts5-l5-7-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-7-2.png)   
+<br><br>
+
+![README](../images/ts5-l5-7-3.png)   
+<br><br>
+
+<hr>
+
+#### L5.8. Review the monitoring tab - schedulers
+
+![README](../images/ts5-l5-8-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-8-2.png)   
+<br><br>
+
+![README](../images/ts5-l5-8-3.png)   
+<br><br>
+
+<hr>
+
+#### L5.9. Review the monitoring tab - DAG processors
+
+![README](../images/ts5-l5-9-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-9-2.png)   
+<br><br>
+
+<hr>
+
+#### L5.10. Review the monitoring tab - workers
+
+![README](../images/ts5-l5-10-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-10-2.png)   
+<br><br>
+
+![README](../images/ts5-l5-10-3.png)   
+<br><br>
+
+![README](../images/ts5-l5-10-4.png)   
+<br><br>
+
+![README](../images/ts5-l5-10-5.png)   
+<br><br>
+
+<hr>
+
+#### L5.11. Review the monitoring tab - triggerers
+
+![README](../images/ts5-l5-11-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-11-2.png)   
+<br><br>
+
+![README](../images/ts5-l5-11-3.png)   
+<br><br>
+
+![README](../images/ts5-l5-11-4.png)   
+<br><br>
+
+![README](../images/ts5-l5-11-5.png)   
+<br><br>
+
+![README](../images/ts5-l5-11-6.png)   
+<br><br>
+
+<hr>
+
+#### L5.12. Review the monitoring tab - webserver
+
+![README](../images/ts5-l5-12-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-12-2.png)   
+<br><br>
+
+<hr>
+
+#### L5.13. Review the monitoring tab - SQL database
+
+![README](../images/ts5-l5-13-1.png)   
+<br><br>
+
+![README](../images/ts5-l5-13-2.png)   
+<br><br>
+
+<hr>
+
+#### L5.14. Review the monitoring tab - SQL database
+
+![README](../images/ts5-l5-14-1.png)   
+<br><br>
+
+
+<hr>
+
