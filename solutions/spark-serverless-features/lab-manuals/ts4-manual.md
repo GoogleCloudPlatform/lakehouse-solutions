@@ -22,7 +22,7 @@ limitations under the License.*
 ## 1.0. About the lab
 
 ### 1.1. Abstract
-This lab is **introductory** in nature and showcases orchestration of Apache Spark applications on Google Cloud Platform on the managed product - **Serverless Managed Service for Apache Spark**, with the serverless managed **Lakehouse runtime catalog** as the lakehouse Iceberg metastore on **Managed Service for Apache Airflow**. 
+This lab is **introductory** in nature and showcases orchestration on **Managed Service for Apache Airflow** of Apache Spark applications running on the managed product - **Serverless Managed Service for Apache Spark**, with the serverless managed **Lakehouse runtime catalog** as the lakehouse Iceberg metastore. 
 
 The goal of the lab is to demystify **Managed Service for Apache Airflow** for lakehouse pipelines through a (zero fluff, zero dazzle) minimum viable end to end example of frozen yogurt (froyo) retail sales analysis to accelerate adoption. This lab builds on the lab in the previous module and operationalizes the froyo analytics medallion architecture in lab Spark notebook as a pipeline of serverless Spark batch jobs showcasing the development continuum. This hands-on lab complements the blog post [Lakehouse Demystified - Part 5: Just enough about Managed Service for Apache Airflow](TODO).
 
@@ -39,7 +39,7 @@ The goal of the lab is to demystify **Managed Service for Apache Airflow** for l
 
 #### What to expect:
 
-In this lab, you will use the environment provisioned in Technical Solution 3 and familiarize yourself with Airflow environments on Managed Service for Apache Airflow and running and monoitoring DAGs.
+In this lab, you will use the environment provisioned in [Technical Solution 3](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS4/solutions/spark-serverless-features/lab-manuals/ts3-manual.md) and familiarize yourself with Airflow environments on Managed Service for Apache Airflow and running and monoitoring DAGs.
 
 <hr>
 
@@ -58,12 +58,12 @@ The hands-on lab takes ~1 hour or less to complete
 
 ### 1.4. Prerequisites
 
-- Completion of Technical Solution 3 - hands-on lab
+- Completion of [Technical Solution 3](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS4/solutions/spark-serverless-features/lab-manuals/ts3-manual.md) - hands-on lab
 
 <hr>
 
 ### 1.5. Resources provisioned
-Refer Technical Solution 3 - hands-on lab
+Refer [Technical Solution 3](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS4/solutions/spark-serverless-features/lab-manuals/ts3-manual.md) - hands-on lab
 
 <hr>
 
@@ -107,7 +107,7 @@ We will build the medallion architecture with Apache Spark, and from silver laye
 
 ### 1.9. Lab Flow
 
-In Technical Solution 3 lab, we built the medallion layers of the lakehouse in a Spark notebook. In this lab, we use four PySpark scripts - one for each layer - bronze, silver, gold and platinum. And execute a pre-constructed pipeline/DAG in Airflow.
+In [Technical Solution 3](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS4/solutions/spark-serverless-features/lab-manuals/ts3-manual.md) lab, we built the medallion layers of the lakehouse in a Spark notebook. In this lab, we use four PySpark scripts - one for each layer - bronze, silver, gold and platinum. And execute a pre-constructed pipeline/DAG in Airflow.
 
 ![README](../images/ts4-lab-flow.png)   
 <br><br>
@@ -135,8 +135,14 @@ The unstructured data will be used in a subsequent hands-on lab.
 |3| [[ABOUT THE LAB] Lab flow](./ts4-manual.md#19-lab-flow) | 
 |4| [[ABOUT THE LAB] The data used in the lab](./ts4-manual.md#110-the-data) | 
 |5| [[ABOUT MANAGED SERVICE FOR APACHE AIRFLOW] Product highlights](./ts4-manual.md#2-product-highlights) | 
-|6| [[ABOUT MANAGED SERVICE FOR APACHE AIRFLOW] Product highlights](./ts4-manual.md#2-product-highlights) | 
-
+|6| [[LAB: BRONZE LAYER INGESTION] Optionally run bronze layer ingestion Spark batches](./ts4-manual.md#l1-optional-run-the-pyspark-scripts-for-bronze-layer-ingestion) | 
+|7| [[LAB: SILVER LAYER CURATION] Optionally run silver layer curation Spark batches](./ts4-manual.md#l2-optional-run-the-pyspark-scripts-for-silver-layer-curation) | 
+|8| [[LAB: GOLD LAYER AGGREGATION] Optionally run the gold layer aggregation Spark batch](./ts4-manual.md#l3-optional-run-the-pyspark-scripts-for-gold-layer-aggregation) | 
+|9| [[LAB: PLATINUM LAYER CONSUMPTION] Optionally run platinum layer reporting Spark batches](./ts4-manual.md#l4-optional-run-the-pyspark-scripts-for-platinum-layer-reporting) | 
+|10| [[LAB: AIRFLOW ENVIRONMENT REVIEW] Explore the Airflow environment on Managed Service for Apache Airflow](./ts4-manual.md#l52-study-the-airflow-environment) | 
+|11| [[LAB: AIRFLOW DAG CODE REVIEW] Study the DAG provided in the lab](./ts4-manual.md#l53-review-the-monitoring-tab---dag-code) | 
+|12| [[LAB: AIRFLOW DAG EXECUTION] Run the DAG from the Airflow UI on Managed Service for Apache Airflow](./ts4-manual.md#55-trigger-the-dag-from-the-airflow-ui-snd-monitor-execution) | 
+|12| [[LAB: DATA LINEAGE REVIEW] Study the lineage of the Apache Iceberg tables in Knowledge Catalog](./ts4-manual.md#57-review-lineage-of-the-iceberg-tables-in-the-lakehouse-in-knowledge-catalog) | 
 
 <hr>
 
@@ -161,12 +167,9 @@ This hands-on lab complements the blog post [Lakehouse Demystified - Part 4: Man
 
 # 3. Lab setup
 
-There is no net new lab setup. We will be reusing the lab setup from Technical Solution 3.
+There is no net new lab setup. We will be reusing the lab setup from [Technical Solution 3](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS4/solutions/spark-serverless-features/lab-manuals/ts3-manual.md).
 
-
-
-
-#==========
+<hr><hr>
 
 
 # LAB
@@ -589,7 +592,7 @@ Search for Airflow in the [cloud console](https://console.cloud.google.com)
 
 ### L5.2. Study the Airflow environment
 
-Click on the various tabs to familairize yourself with the UI and the environment specs automatically created for you via Terraform in technical solution 3.
+Click on the various tabs to familairize yourself with the UI and the environment specs automatically created for you via Terraform in [technical solution 3](https://github.com/GoogleCloudPlatform/lakehouse-solutions/blob/TS4/solutions/spark-serverless-features/lab-manuals/ts3-manual.md).
 
 #### L5.2.1. Review the environment configuration tab
 
