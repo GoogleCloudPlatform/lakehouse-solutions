@@ -1135,7 +1135,7 @@ start_task >> bronze_ingestion_parallel_tasks >> bronze_to_silver_bridge >> silv
 
 <hr>
 
-### 5.5. Trigger the DAG from the Airflow UI
+### 5.5. Trigger the DAG from the Airflow UI snd monitor execution
 
 The Airflow UI is the OSS UI.
 
@@ -1149,6 +1149,7 @@ The Airflow UI is the OSS UI.
 <br><br>
 
 <hr>
+
 
 #### 5.5.2. Trigger the DAG
 
@@ -1221,8 +1222,35 @@ And the complete list of bronze layer ingestion tasks mapped to Spark batches..
 
 <hr>
 
-=====================================================================================================
-THIS CONCLUDES THE LAB FOR MANAGED AIRFLOW SERVICE
-SHUT DOWN THE LAB TO AVOID BILLING UNLESS YOU ARE WORKING ON SUBSEQUENT LABS
-=====================================================================================================
+### 5.6. Review a Spark batch job
+
+When you execute a Spark batch via Airflow, the cohort property is automatically added. This can be used for autotuning the Spark batches.
+
+![README](../images/ts4-l5-6-1.png)   
+<br><br>
+
+![README](../images/ts4-l5-6-2.png)   
+<br><br>
+
+<hr>
+
+### 5.7. Review a lineage of the Iceberg tables in the lakehouse in Knowledge Catalog
+
+When you execute a Spark batch via Airflow, the cohort property is automatically added. This can be used for autotuning the Spark batches.
+
+![README](../images/ts4-l5-7.png)   
+<br><br>
+
+
+
+<hr>
+
+
+
+
+
+##### =====================================================================================================
+##### THIS CONCLUDES THE LAB FOR MANAGED AIRFLOW SERVICE
+##### SHUT DOWN THE LAB TO AVOID BILLING UNLESS YOU ARE WORKING ON SUBSEQUENT LABS
+##### =====================================================================================================
 
