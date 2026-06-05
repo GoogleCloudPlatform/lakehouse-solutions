@@ -1234,7 +1234,7 @@ When you execute a Spark batch via Airflow, the cohort property is automatically
 
 <hr>
 
-### 5.7. Review a lineage of the Iceberg tables in the lakehouse in Knowledge Catalog
+### 5.7. Review lineage of the Iceberg tables in the lakehouse in Knowledge Catalog
 
 When you execute a Spark batch via Airflow, the cohort property is automatically added. This can be used for autotuning the Spark batches.
 
