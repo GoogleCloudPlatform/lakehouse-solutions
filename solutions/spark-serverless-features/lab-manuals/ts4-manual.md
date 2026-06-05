@@ -611,7 +611,7 @@ Click on the various tabs to familairize yourself with the UI and the environmen
 ![README](../images/ts4-l5-2-16-5.png)   
 <br><br>
 
-![README](../images/ts4-l52-2-16-6.png)   
+![README](../images/ts4-l5-2-16-6.png)   
 <br><br>
 
 
@@ -924,8 +924,14 @@ with models.DAG(
 
 
 #### 5.4.1. Read in the Airflow variables
-Note the lines below. They read in the Airflow variables we set at the Airflow environment level. The variables were capitalized and have 'AIRFLOW_VAR' prefix. The below is the contruct to read them in.
 
+If you recall the Airflow variables tab in the UI (autocreated via Terraform), we defined Airflow variables in uppercase and prefixed them with 'AIRFLOW_VAR' prefix. 
+
+![README](../images/ts4-l5-2-16-5.png)   
+<br><br>
+
+
+The below is the contruct to read them into the DAG.
 ```
 # Read environment variables into local variables
 project_id = models.Variable.get("project_id")
@@ -937,6 +943,281 @@ spark_runtime_version = models.Variable.get("spark_runtime_version")
 lrc_rest_api_version= models.Variable.get("lrc_rest_api_version")
 ```
 
-#### 5.4.2. Read in the Airflow variables
+#### 5.4.2. Specify the User Managed Service Account to run the DAG as
 
+This is a best practice.
+
+```
+# User Managed Service Account FQN
+service_account_id= umsa+"@"+project_id+".iam.gserviceaccount.com"
+```
+
+#### 5.4.3. Specify the PySpark scripts and their full path
+
+We will reference this further on.
+```
+# PySpark script files in GCS, of the individual Spark applications in the pipeline
+bronze_layer_ingestion_script= "gs://"+code_bucket+"/scripts/pyspark/bronze_layer_ingestion.py"
+silver_layer_curation_script= "gs://"+code_bucket+"/scripts/pyspark/silver_layer_curation.py"
+gold_layer_aggregation_script= "gs://"+code_bucket+"/scripts/pyspark/gold_layer_aggregation.py"
+platinum_layer_reporting_script= "gs://"+code_bucket+"/scripts/pyspark/platinum_layer_reporting.py"
+```
+
+#### 5.4.4. Specify the Spark configuration required at Spark session start time
+
+These need to be passed to the Serverless Spark batch job.
+
+```
+# Spark configurations for the serverless Spark batches
+spark_properties_with_iceberg_catalog = {
+    "spark.sql.adaptive.enabled": "true",
+    "spark.sql.adaptive.advisoryPartitionSizeInBytes": "128mb",
+    "spark.sql.adaptive.coalescePartitions.enabled": "true",
+    f"spark.sql.defaultCatalog": iceberg_catalog_name,
+    f"spark.sql.catalog.{iceberg_catalog_name}": "org.apache.iceberg.spark.SparkCatalog",
+    f"spark.sql.catalog.{iceberg_catalog_name}.type": "rest",
+    f"spark.sql.catalog.{iceberg_catalog_name}.uri": f"https://biglake.googleapis.com/iceberg/{lrc_rest_api_version}/restcatalog",
+    f"spark.sql.catalog.{iceberg_catalog_name}.warehouse": f"gs://{lakehouse_bucket_name}",
+    f"spark.sql.catalog.{iceberg_catalog_name}.io-impl": "org.apache.iceberg.gcp.gcs.GCSFileIO",
+    f"spark.sql.catalog.{iceberg_catalog_name}.header.x-goog-user-project": project_id,
+    f"spark.sql.catalog.{iceberg_catalog_name}.rest.auth.type": "org.apache.iceberg.gcp.auth.GoogleAuthManager",
+    "spark.sql.extensions": "org.apache.iceberg.spark.extensions.IcebergSparkSessionExtensions",
+    f"spark.sql.catalog.{iceberg_catalog_name}.rest-metrics-reporting-enabled": "false",
+    "spark.dataproc.lineage.enabled": "true",
+    "spark.openlineage.transport.type": "gcplineage",
+    "spark.extraListeners": "io.openlineage.spark.agent.OpenLineageSparkListener",
+    "spark.sql.repl.eagerEval.enabled": "True",
+    "spark.openlineage.namespace": "froyo_spark_jobs"
+}
+```
+
+#### 5.4.5. Define the serverless Spark batch configuration
+
+This is covered in the snippet below -
+```
+...
+def generate_batch_config(layer: str, entity_name: str):
+    '''
+    This function generates the batch config for a given layer and data entity. It uses the individual script files in GCS as templates and replaces the placeholder values with the actual values for each data entity and layer.
+    '''
+    if layer == "bronze" and entity_name in ["customers", "customers_sensitive", "products", "orders", "order_items", "regions"]:
+        return {
+            "pyspark_batch": {
+                "main_python_file_uri": bronze_layer_ingestion_script,
+                "args": [
+                  project_id,
+                  staging_bucket_name,
+                  lakehouse_bucket_name,
+                  entity_name
+                ]
+            },
+            "environment_config":{
+                "execution_config":{
+                    "service_account": service_account_id,
+                    "subnetwork_uri": subnet
+                },
+                
+            },
+            "runtime_config": {
+                "version": spark_runtime_version,
+                "properties": spark_properties_foundational
+            },
+        }...
+```
+
+
+#### 5.4.6. Define the DAG
+
+This is covered in the snippet below -
+```
+...
+with models.DAG(
+    dag_name,
+    schedule_interval=None,
+    start_date = days_ago(2),
+    catchup=False,
+) as dag_serverless_batch:
+...
+
+```
+
+#### 5.4.7. Define the tasks
+
+This is covered in the snippet below -
+```
+...
+ start_task = EmptyOperator(task_id="start")
+    end_task = EmptyOperator(task_id="end")
+    bronze_to_silver_bridge = EmptyOperator(task_id="bronze_to_silver_bridge")
+
+    # Generate the batch config and create tasks for the bronze layer ingestion jobs in a loop, one for each data entity. These tasks will run in parallel.
+    bronze_ingestion_parallel_tasks = []
+    for data_entity_name in bronze_data_entities:
+        task_id = f"ingest_bronze_{data_entity_name}"
+        batch_id =  f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+  f"-bronze-{data_entity_name.replace('_', '-')}"
+        batch_config = generate_batch_config("bronze", data_entity_name)
+
+        task = DataprocCreateBatchOperator(
+            task_id=task_id,
+            project_id=project_id,
+            region=region,
+            batch=batch_config,
+            batch_id=batch_id,
+        )
+        bronze_ingestion_parallel_tasks.append(task)
+
+    # Generate the batch config and create tasks for the silver layer curation jobs in a loop, one for each data entity. These tasks will run in parallel.
+    silver_curation_parallel_tasks = []
+    for data_entity_name in silver_data_entities:
+        task_id = f"curate_silver_{data_entity_name}"
+        batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+ f"-silver-{data_entity_name.replace('_', '-')}"
+        batch_config = generate_batch_config("silver", data_entity_name)
+    
+        task = DataprocCreateBatchOperator(
+            task_id=task_id,
+            project_id=project_id,
+            region=region,
+            batch=batch_config,
+            batch_id=batch_id,
+        )
+        silver_curation_parallel_tasks.append(task)
+
+    # This silver curation task for orders is created separately, as the orders curation logic needs to reference the curated products data in the silver layer. Hence, we cannot run the silver curation task for orders in parallel with the other silver curation tasks. We need to run it sequentially after the other silver curation tasks are done, which is what we achieve by setting up the dependencies in the end of this code.
+    task_id = f"curate_silver_orders"
+    batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+  f"-silver-orders"
+    batch_config = generate_batch_config("silver", "orders")
+
+    silver_curation_order_task = DataprocCreateBatchOperator(
+        task_id=task_id,
+        project_id=project_id,
+        region=region,
+        batch=batch_config,
+        batch_id=batch_id,
+    )
+
+    # Generate the batch config and create task for the gold layer aggregation job
+    task_id = f"aggregate_gold_orders"
+    batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+  f"-gold-orders"
+    batch_config = generate_batch_config("gold", "orders")
+
+    gold_aggregation_order_task = DataprocCreateBatchOperator(
+        task_id=task_id,
+        project_id=project_id,
+        region=region,
+        batch=batch_config,
+        batch_id=batch_id,
+    )
+
+    platinum_reporting_parallel_tasks = []
+    for entity_name in platinum_reporting_entities:
+        task_id = f"run_platinum_rpt_{entity_name.lower()}"
+        batch_id = f"af-{{{{ ts_nodash | lower }}}}-{{{{ task_instance.try_number }}}}-" + generate_unique_task_batch_id()+ f"-platinum-{entity_name.lower().replace('_', '-')}"
+        batch_config = generate_batch_config("platinum", entity_name)
+    
+        task = DataprocCreateBatchOperator(
+            task_id=task_id,
+            project_id=project_id,
+            region=region,
+            batch=batch_config,
+            batch_id=batch_id,
+        )
+        platinum_reporting_parallel_tasks.append(task)
+...
+
+```
+
+#### 5.4.8. Chain the tasks together
+
+This is covered in the snippet below -
+```
+start_task >> bronze_ingestion_parallel_tasks >> bronze_to_silver_bridge >> silver_curation_parallel_tasks >> silver_curation_order_task >> gold_aggregation_order_task >> platinum_reporting_parallel_tasks >> end_task
+```
+
+<hr>
+
+### 5.5. Trigger the DAG from the Airflow UI
+
+The Airflow UI is the OSS UI.
+
+#### 5.5.1. Navigate to the Airflow UI
+
+
+![README](../images/ts4-5-5-1-1.png)   
+<br><br>
+
+![README](../images/ts4-5-5-1-2.png)   
+<br><br>
+
+<hr>
+
+#### 5.5.2. Trigger the DAG
+
+![README](../images/ts4-5-5-2-1.png)   
+<br><br>
+
+<hr>
+
+#### 5.5.3. Parallel execution of bronzer layer ingestion tasks
+
+![README](../images/ts4-5-5-3-1.png)   
+<br><br>
+
+Click on one of the tasks to get to the logs and trace it to the batch job:
+![README](../images/ts4-5-5-3-2.png)   
+<br><br>
+
+![README](../images/ts4-5-5-3-3.png)   
+<br><br>
+
+Navigate to Managed Spark Serverless Batches UI and look up the batch
+
+![README](../images/ts4-5-5-3-4.png)   
+<br><br>
+
+And the complete list of bronze layer ingestion tasks mapped to Spark batches..
+
+![README](../images/ts4-5-5-3-5.png)   
+<br><br>
+
+
+<hr>
+
+
+#### 5.5.4. Parallel execution of silver layer curation tasks
+
+![README](../images/ts4-5-5-4-1.png)   
+<br><br>
+
+<hr>
+
+#### 5.5.5. Execution of gold layer aggregation task
+
+![README](../images/ts4-5-5-5-1.png)   
+<br><br>
+
+<hr>
+
+#### 5.5.6. Parallel execution of platinum layer reporting tasks
+
+![README](../images/ts4-5-5-6-1.png)   
+<br><br>
+
+<hr>
+
+#### 5.5.7. Successfully completed DAG
+
+![README](../images/ts4-5-5-7-1.png)   
+<br><br>
+
+![README](../images/ts4-5-5-7-2.png)   
+<br><br>
+
+<hr>
+
+#### 5.5.8. Successfully completed corressponding serverless Spark batches
+
+![README](../images/ts4-5-5-8-1.png)   
+<br><br>
+
+<hr>
 
