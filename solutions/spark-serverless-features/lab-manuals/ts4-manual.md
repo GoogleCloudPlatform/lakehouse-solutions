@@ -1221,3 +1221,8 @@ And the complete list of bronze layer ingestion tasks mapped to Spark batches..
 
 <hr>
 
+=====================================================================================================
+THIS CONCLUDES THE LAB FOR MANAGED AIRFLOW SERVICE
+SHUT DOWN THE LAB TO AVOID BILLING UNLESS YOU ARE WORKING ON SUBSEQUENT LABS
+=====================================================================================================
+
