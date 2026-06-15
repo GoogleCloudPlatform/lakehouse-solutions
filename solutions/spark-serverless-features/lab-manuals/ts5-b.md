@@ -57,8 +57,6 @@ terraform apply \
   -var="gcp_region=${GCP_REGION}" \
   -var="lrc_rest_api_version=${LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION}" \
   -auto-approve >> spark-serverless-performance-tf-core.output
-  
-
 ```
 
 Takes ~10 minutes to complete. In a separate cloud shell tab, you can tail the output file for execution state through completion-
@@ -66,8 +64,6 @@ Takes ~10 minutes to complete. In a separate cloud shell tab, you can tail the o
 ```
 tail -f ~/lakehouse-solutions/solutions/performance-benchmarking/provisioning-automation/core-tf/terraform/spark-serverless-performance-tf-core.output
 ```
-
-
 
 <hr>
 
@@ -88,14 +84,25 @@ Serverless.
 
 ### Data Generation
 
-```bash
+```
+PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
+S8S_SPARK_RUNTIME_VERSION="2.3"
+CODE_BUCKET="spark-perf-lab-code-bucket-$PROJECT_NBR"
+DATA_BUCKET="spark-perf-lab-data-$PROJECT_NBR"
+LOCATION="us-central1"
+UMSA_FQN="spark-perf-lab-umsa@$PROJECT_ID.iam.gserviceaccount.com"
+SUBNET_NAME="spark-perf-lab-snet"
+
+
 gcloud dataproc batches submit pyspark \
-    gs://haozhu/scripts/ab_test_benchmark/generate_data.py \
-    --batch "abtest-datagen-$(date +%Y%m%d%H%M%S)" \
-    --region us-east1 \
-    --version 2.3 \
-    --subnet default \
-    --deps-bucket gs://haozhu \
+    "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_generate_data.py" \
+    --batch "nvidia-abtest-datagen-$(date +%Y%m%d%H%M%S)" \
+    --region $LOCATION \
+    --version $S8S_SPARK_RUNTIME_VERSION \
+    --subnet $SUBNET_NAME \
+    --deps-bucket "gs://spark-perf-lab-code-bucket-$PROJECT_NBR" \
+    --service-account $UMSA_FQN \
     --properties "\
 spark.executor.instances=8,\
 spark.executor.cores=8,\
@@ -104,10 +111,12 @@ spark.driver.cores=4,\
 spark.driver.memory=8g,\
 spark.dynamicAllocation.enabled=false" \
     -- \
-    --data-dir gs://haozhu/data/ab_test \
+    --data-dir "gs://$DATA_BUCKET/data/ab_test" \
     --num-rows 1300000000 \
     --num-users 200000000
 ```
+
+2:47 pm
 
 ## Infrastructure
 
@@ -117,7 +126,7 @@ accelerator, ensuring a fair apples-to-apples comparison.
 | Config | CPU | GPU |
 |--------|-----|-----|
 | Region | us-east1 | us-east1 |
-| Runtime version | 2.3.30 | 2.3.30 |
+| Runtime version | 2.3.35 | 2.3.35 |
 | Executors | 4 | 4 |
 | Executor cores | 8 | 8 |
 | Executor memory | 16g | 16g |
@@ -137,8 +146,8 @@ GPU handles 200 partitions efficiently due to GPU-accelerated shuffle.
 
 ```bash
 gcloud dataproc batches submit pyspark \
-    gs://haozhu/scripts/ab_test_benchmark/run_benchmark.py \
-    --batch "abtest-cpu-$(date +%Y%m%d%H%M%S)" \
+    "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
+    --batch "nvidia-abtest-cpu-$(date +%Y%m%d%H%M%S)" \
     --region us-east1 \
     --version 2.3 \
     --subnet default \
@@ -172,7 +181,7 @@ spark.eventLog.dir=gs://haozhu/eventlog" \
 ```bash
 gcloud dataproc batches submit pyspark \
     gs://haozhu/scripts/ab_test_benchmark/run_benchmark.py \
-    --batch "abtest-gpu-$(date +%Y%m%d%H%M%S)" \
+    --batch "nvidia-gpu-$(date +%Y%m%d%H%M%S)" \
     --region us-east1 \
     --version 2.3 \
     --subnet default \
