@@ -6,13 +6,12 @@
 
 ## Use Case
 
-This benchmark reproduces a **production-scale A/B test metric aggregation pipeline** commonly used by companies running online experiments. The workload computes per-user metric sums for each active test, enabling data science teams to measure the causal impact of product changes across hundreds of metrics simultaneously.
+This benchmark simulates a **production-scale A/B test metric aggregation pipeline** commonly used by companies running online experiments for their product changes. The workload computes per-user metric sums for each active test, enabling data science teams to measure the causal impact of product changes across hundreds of metrics simultaneously.
 
 This is a representative workload for any organization operating an experimentation platform at scale (ad tech, social media, e-commerce, fintech, etc.).
 
-## Business Logic
 
-### What Is A/B Testing?
+## What Is A/B testing?
 
 A/B testing is how companies decide whether a product change is actually good. Users
 are split into two groups randomly:
@@ -22,12 +21,14 @@ are split into two groups randomly:
 
 Key metrics (clicks, purchases, engagement, etc.) are then measured to determine whether the treatment group performs better. This is how streaming platforms evaluate new recommendation algorithms, how e-commerce sites test checkout flows, or how social media apps test new feed layouts.
 
-### What Does This Pipeline Do?
+## Business Logic
+
+### What does this pipeline do?
 
 At scale, a company might be running **hundreds of tests simultaneously**, each tracking **hundreds of metrics** across **millions of visitors**. This pipeline is the data engine that powers that analysis. It takes raw user activity (impressions, interactions, conversions, searches, referrals), filters it to only count events
 within a **30-day window after** each visitor was assigned to a test, aggregates the results per visitor per test, caps outliers so a single power user doesn't skew the results, and writes the output for downstream statistical analysis (p-values, confidence intervals, and test decisions).
 
-### Pipeline Steps
+### Pipeline steps
 
 The pipeline executes a single, large-scale ETL job that:
 
