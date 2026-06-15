@@ -125,7 +125,7 @@ accelerator, ensuring a fair apples-to-apples comparison.
 
 | Config | CPU | GPU |
 |--------|-----|-----|
-| Region | us-east1 | us-east1 |
+| Region | us-central1 | us-central1 |
 | Runtime version | 2.3.35 | 2.3.35 |
 | Executors | 4 | 4 |
 | Executor cores | 8 | 8 |
