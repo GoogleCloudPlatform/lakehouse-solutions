@@ -185,10 +185,6 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
 24 minutes 27 seconds
 
 
-spark.dataproc.driver.compute.tier=premium,\
-spark.dataproc.executor.compute.tier=premium,\
-spark.dataproc.driver.disk.tier=premium,\
-spark.dataproc.executor.disk.tier=premium,\
 
 ### GPU Run
 
@@ -222,6 +218,7 @@ spark.driver.memory=8g,\
 dataproc.tier=premium, \
 spark.dataproc.driver.disk.size=375G,\
 spark.dataproc.executor.resource.accelerator.type=l4,\
+spark.dataproc.executor.storage.class=performance, \
 spark.plugins=com.nvidia.spark.SQLPlugin,\
 spark.rapids.sql.enabled=true,\
 spark.rapids.memory.pinnedPool.size=4G,\
