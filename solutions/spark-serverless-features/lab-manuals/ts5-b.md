@@ -186,9 +186,22 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu" 
 ```
 
+24 minutes 27 seconds
+
 ### GPU Run
 
-```bash
+```
+
+
+PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
+S8S_SPARK_RUNTIME_VERSION="2.3"
+CODE_BUCKET="spark-perf-lab-code-bucket-$PROJECT_NBR"
+DATA_BUCKET="spark-perf-lab-data-$PROJECT_NBR"
+LOCATION="us-central1"
+UMSA_FQN="spark-perf-lab-umsa@$PROJECT_ID.iam.gserviceaccount.com"
+SUBNET_NAME="spark-perf-lab-snet"
+
 gcloud dataproc batches submit pyspark \
     "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
     --batch "nvidia-abtest-cpu-baseline-$(date +%Y%m%d%H%M%S)" \
@@ -219,7 +232,7 @@ spark.sql.autoBroadcastJoinThreshold=-1,\
 spark.sql.shuffle.partitions=200,\
 spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version=2,\
 spark.eventLog.enabled=true,\
-spark.eventLog.dir=gs://haozhu/eventlog" \
+spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
     --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu" 
