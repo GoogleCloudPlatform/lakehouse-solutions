@@ -116,7 +116,7 @@ spark.dynamicAllocation.enabled=false" \
     --num-users 200000000
 ```
 
-2:47 pm
+~7-8 minutes
 
 ## Infrastructure
 
@@ -147,11 +147,12 @@ GPU handles 200 partitions efficiently due to GPU-accelerated shuffle.
 ```bash
 gcloud dataproc batches submit pyspark \
     "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
-    --batch "nvidia-abtest-cpu-$(date +%Y%m%d%H%M%S)" \
-    --region us-east1 \
-    --version 2.3 \
-    --subnet default \
-    --deps-bucket gs://haozhu \
+    --batch "nvidia-abtest-cpu-baseline-$(date +%Y%m%d%H%M%S)" \
+    --region $LOCATION \
+    --version $S8S_SPARK_RUNTIME_VERSION \
+    --subnet $SUBNET_NAME \
+    --deps-bucket "gs://spark-perf-lab-code-bucket-$PROJECT_NBR \
+    --service-account $UMSA_FQN \
     --properties "\
 spark.dynamicAllocation.enabled=false,\
 spark.executor.instances=4,\
@@ -169,10 +170,10 @@ spark.sql.autoBroadcastJoinThreshold=-1,\
 spark.sql.shuffle.partitions=1000,\
 spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version=2,\
 spark.eventLog.enabled=true,\
-spark.eventLog.dir=gs://haozhu/eventlog" \
+spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
-    --data-dir gs://haozhu/data/ab_test \
-    --output-dir gs://haozhu/data/ab_test_output_cpu \
+    --data-dir "gs://$DATA_BUCKET/data/ab_test" \
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu" \
     --shuffle-partitions 1000
 ```
 
