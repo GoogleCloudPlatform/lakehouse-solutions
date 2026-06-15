@@ -1,5 +1,65 @@
 # A/B Test Metric Aggregation - Dataproc Serverless Benchmark
 
+
+## Provisioning the environment
+
+
+
+
+## Foundational
+
+
+
+
+### Core
+
+```
+cd ~/lakehouse-solutions-build/solutions/performance-benchmarking/provisioning-automation/core-tf/terraform
+
+PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
+PROJECT_NAME=`gcloud projects describe ${PROJECT_ID} | grep name | cut -d':' -f2 | xargs`
+GCP_ACCOUNT_NAME=`gcloud auth list --filter=status:ACTIVE --format="value(account)"`
+GCP_REGION="us-central1"
+DEPLOYER_ACCOUNT_NAME=$GCP_ACCOUNT_NAME
+ORG_ID=`gcloud organizations list --format="value(name)"`
+S8S_SPARK_RUNTIME_VERSION="3.0"
+MANAGED_AIRFLOW_SERVICE_VERSION="composer-3-airflow-2.11.1-build.6"
+LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION="v1beta"
+
+
+```
+
+```
+terraform init
+terraform apply \
+  -var="project_id=${PROJECT_ID}" \
+  -var="project_name=${PROJECT_NAME}" \
+  -var="project_number=${PROJECT_NBR}" \
+  -var="gcp_account_name=${GCP_ACCOUNT_NAME}" \
+  -var="deployment_service_account_name=${DEPLOYER_ACCOUNT_NAME}" \
+  -var="org_id=${ORG_ID}" \
+  -var="spark_runtime_version=${S8S_SPARK_RUNTIME_VERSION}" \
+  -var="gcp_region=${GCP_REGION}" \
+  -var="managed_airflow_image_version=${MANAGED_AIRFLOW_SERVICE_VERSION}" \
+  -var="lrc_rest_api_version=${LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION}" \
+  -auto-approve >> spark-serverless-performance-tf-core.output
+  
+
+```
+
+Takes ~10 minutes to complete. In a separate cloud shell tab, you can tail the output file for execution state through completion-
+
+tail -f ~/lakehouse-solutions/solutions/performance-benchmarking/provisioning-automation/core-tf/terraform/spark-serverless-performance-tf-core.output
+
+
+
+
+<hr>
+
+
+
+
 ## Overview
 
 This benchmark compares CPU vs GPU (NVIDIA L4) performance and cost for a
