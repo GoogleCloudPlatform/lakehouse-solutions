@@ -1,16 +1,14 @@
-# A/B Test Metric Aggregation Benchmark
+
+
+
+
+# LAB: A/B Test Metric Aggregation Benchmark
 
 ## Use Case
 
-This benchmark reproduces a **production-scale A/B test metric aggregation
-pipeline** commonly used by companies running online experiments. The workload
-computes per-user metric sums for each active test, enabling data science
-teams to measure the causal impact of product changes across hundreds of
-metrics simultaneously.
+This benchmark reproduces a **production-scale A/B test metric aggregation pipeline** commonly used by companies running online experiments. The workload computes per-user metric sums for each active test, enabling data science teams to measure the causal impact of product changes across hundreds of metrics simultaneously.
 
-This is a representative workload for any organization operating an
-experimentation platform at scale (ad tech, social media, e-commerce,
-fintech, etc.).
+This is a representative workload for any organization operating an experimentation platform at scale (ad tech, social media, e-commerce, fintech, etc.).
 
 ## Business Logic
 
@@ -22,53 +20,25 @@ are split into two groups randomly:
 - **Control (A)** — sees the old version
 - **Treatment (B)** — sees the new version
 
-Key metrics (clicks, purchases, engagement, etc.) are then measured to determine
-whether the treatment group performs better. This is how streaming platforms evaluate new recommendation algorithms, how
-e-commerce sites test checkout flows, or how social media apps test new feed layouts.
+Key metrics (clicks, purchases, engagement, etc.) are then measured to determine whether the treatment group performs better. This is how streaming platforms evaluate new recommendation algorithms, how e-commerce sites test checkout flows, or how social media apps test new feed layouts.
 
 ### What Does This Pipeline Do?
 
-At scale, a company might be running **hundreds of tests simultaneously**, each
-tracking **hundreds of metrics** across **millions of visitors**. This pipeline is the
-data engine that powers that analysis. It takes raw user activity (impressions,
-interactions, conversions, searches, referrals), filters it to only count events
-within a **30-day window after** each visitor was assigned to a test, aggregates the results
-per visitor per test, caps outliers so a single power user doesn't skew the results,
-and writes the output for downstream statistical analysis (p-values, confidence
-intervals, and test decisions).
+At scale, a company might be running **hundreds of tests simultaneously**, each tracking **hundreds of metrics** across **millions of visitors**. This pipeline is the data engine that powers that analysis. It takes raw user activity (impressions, interactions, conversions, searches, referrals), filters it to only count events
+within a **30-day window after** each visitor was assigned to a test, aggregates the results per visitor per test, caps outliers so a single power user doesn't skew the results, and writes the output for downstream statistical analysis (p-values, confidence intervals, and test decisions).
 
 ### Pipeline Steps
 
 The pipeline executes a single, large-scale ETL job that:
 
-1. **Collects raw metric events** from multiple instrumentation pipelines
-  (impressions, interactions, conversions, searches, referrals,
-   etc.), each producing a separate activity log table.
-2. **Normalizes each metric** into a common schema
-  `(visitor_id, measure_value, metric_id, timestamp)`. Each source reads a
-   specific measure column, filters out null and zero values along with invalid
-   visitor IDs, casts to double, and tags with an integer `metric_id`.
-3. **Pre-aggregates** the normalized metrics by `(visitor_id, metric_id,
-  timestamp)`using`SUM`, collapsing duplicate events from the same visitor and
-   metric in the same time window.
-4. **Joins with the assignment table** via a SortMergeJoin on `visitor_id`, with
-  a windowed inequality filter `ts >= assigned_at AND ts < assigned_at + 30 days`
-   (both as bigint epoch seconds). This ensures only events within a 30-day
-   analysis window after assignment are counted, preventing both pre-treatment
-   bias and stale data contamination.
-5. **Joins with test configuration** via BroadcastHashJoin to filter down
-  to only the (metric_id, test_id, group_id) combinations in active
-   tests. The config is pre-filtered to primary metrics with `agg_method =  "total"`, `calc_mode != "daily_active"`, `is_primary_metric = "true"`,
-   and `cap_threshold IS NOT NULL`, and picks up the `cap_threshold` value.
-6. **Final aggregation** groups by `(visitor_id, test_id, group_id,
-  metric_id)`and computes`SUM(measure_value)`,` MIN(cap_threshold)`,  and` COUNT(*)`(as`event_count`). Measure values are capped using`  LEAST(total, min_cap)` to reduce the influence of outliers on test
-   results.
-7. **Left-outer joins with a weight lookup** (derived from the same config
-  table via `AVG(bucket_weight) GROUP BY metric_id`) to determine the
-   average weight per metric, used with `xxhash64` to compute a bucket key
-   for balanced output files.
-8. **Writes the result** as Parquet, partitioned by `metric_id`, to the
-  output path for downstream statistical analysis.
+1. **Collects raw metric events** from multiple instrumentation pipelines (impressions, interactions, conversions, searches, referrals, etc.), each producing a separate activity log table.
+2. **Normalizes each metric** into a common schema `(visitor_id, measure_value, metric_id, timestamp)`. Each source reads a specific measure column, filters out null and zero values along with invalid visitor IDs, casts to double, and tags with an integer `metric_id`.
+3. **Pre-aggregates** the normalized metrics by `(visitor_id, metric_id, timestamp)`using`SUM`, collapsing duplicate events from the same visitor and metric in the same time window.
+4. **Joins with the assignment table** via a SortMergeJoin on `visitor_id`, with a windowed inequality filter `ts >= assigned_at AND ts < assigned_at + 30 days` (both as bigint epoch seconds). This ensures only events within a 30-day analysis window after assignment are counted, preventing both pre-treatment bias and stale data contamination.
+5. **Joins with test configuration** via BroadcastHashJoin to filter down to only the (metric_id, test_id, group_id) combinations in active tests. The config is pre-filtered to primary metrics with `agg_method =  "total"`, `calc_mode != "daily_active"`, `is_primary_metric = "true"`, and `cap_threshold IS NOT NULL`, and picks up the `cap_threshold` value.
+6. **Final aggregation** groups by `(visitor_id, test_id, group_id, metric_id)`and computes`SUM(measure_value)`,` MIN(cap_threshold)`,  and` COUNT(*)`(as`event_count`). Measure values are capped using`  LEAST(total, min_cap)` to reduce the influence of outliers on test results.
+7. **Left-outer joins with a weight lookup** (derived from the same config table via `AVG(bucket_weight) GROUP BY metric_id`) to determine the average weight per metric, used with `xxhash64` to compute a bucket key for balanced output files.
+8. **Writes the result** as Parquet, partitioned by `metric_id`, to the output path for downstream statistical analysis.
 
 ## Table Schemas
 
@@ -137,11 +107,9 @@ The pipeline executes a single, large-scale ETL job that:
 
 ## Benchmark Results (Dataproc Serverless)
 
-**Data scale**: 6.5 billion rows (5 activity logs x 1.3B rows each + 200M
-assignment), 61.5 GiB on GCS.
+**Data scale**: 6.5 billion rows (5 activity logs x 1.3B rows each + 200M assignment), 61.5 GiB on GCS.
 
-All runs use identical infrastructure (Premium compute/disk, 8 cores and 16 GB
-per executor) except executor count and GPU accelerator.
+All runs use identical infrastructure (Premium compute/disk, 8 cores and 16 GB per executor) except executor count and GPU accelerator.
 
 ### Performance
 
