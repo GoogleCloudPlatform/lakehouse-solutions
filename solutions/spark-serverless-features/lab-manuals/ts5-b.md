@@ -8,6 +8,21 @@
 
 ## Foundational
 
+```
+PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+
+cd ~/lakehouse-solutions/solutions/performance-benchmarking/provisioning-automation/foundations-tf
+
+terraform init
+terraform apply \
+  -var="project_id=${PROJECT_ID}" \
+  -auto-approve >> spark-serverless-performance-tf-foundations.output
+```
+
+
+```
+tail -f spark-serverless-performance-tf-foundations.output
+```
 
 
 
@@ -23,8 +38,7 @@ GCP_ACCOUNT_NAME=`gcloud auth list --filter=status:ACTIVE --format="value(accoun
 GCP_REGION="us-central1"
 DEPLOYER_ACCOUNT_NAME=$GCP_ACCOUNT_NAME
 ORG_ID=`gcloud organizations list --format="value(name)"`
-S8S_SPARK_RUNTIME_VERSION="3.0"
-MANAGED_AIRFLOW_SERVICE_VERSION="composer-3-airflow-2.11.1-build.6"
+S8S_SPARK_RUNTIME_VERSION="2.3"
 LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION="v1beta"
 
 
@@ -41,7 +55,6 @@ terraform apply \
   -var="org_id=${ORG_ID}" \
   -var="spark_runtime_version=${S8S_SPARK_RUNTIME_VERSION}" \
   -var="gcp_region=${GCP_REGION}" \
-  -var="managed_airflow_image_version=${MANAGED_AIRFLOW_SERVICE_VERSION}" \
   -var="lrc_rest_api_version=${LAKEHOUSE_RUNTIME_CATALOG_REST_API_VERSION}" \
   -auto-approve >> spark-serverless-performance-tf-core.output
   
@@ -50,8 +63,9 @@ terraform apply \
 
 Takes ~10 minutes to complete. In a separate cloud shell tab, you can tail the output file for execution state through completion-
 
+```
 tail -f ~/lakehouse-solutions/solutions/performance-benchmarking/provisioning-automation/core-tf/terraform/spark-serverless-performance-tf-core.output
-
+```
 
 
 
