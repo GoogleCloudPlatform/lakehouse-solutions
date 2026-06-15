@@ -173,8 +173,7 @@ spark.eventLog.enabled=true,\
 spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
-    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu" \
-    --shuffle-partitions 1000
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu" 
 ```
 
 ### GPU Run
@@ -223,7 +222,6 @@ spark.eventLog.dir=gs://haozhu/eventlog" \
 
 | Metric | CPU (4 exec) | CPU (2 exec) | GPU (4 exec) | GPU (2 exec) |
 |--------|-------------|-------------|-------------|-------------|
-| Batch ID | `abtest-cpu-20260411135112` | `abtest-cpu-2exec-20260413083136` | `abtest-gpu-20260411135112` | `abtest-gpu-2exec-20260413074958` |
 | Query duration | **1,571 s (26.2 min)** | **3,065 s (51.1 min)** | **489 s (8.2 min)** | **938 s (15.6 min)** |
 | **Speedup vs CPU (same exec)** | 1.0x | 1.0x | **3.21x** | **3.27x** |
 | Input data | 61.5 GiB | 61.5 GiB | 61.5 GiB | 61.5 GiB |
