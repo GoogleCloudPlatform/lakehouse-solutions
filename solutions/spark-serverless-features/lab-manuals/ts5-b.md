@@ -87,7 +87,7 @@ Serverless.
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
-S8S_SPARK_RUNTIME_VERSION="2.3"
+S8S_SPARK_RUNTIME_VERSION="3.0"
 CODE_BUCKET="spark-perf-lab-code-bucket-$PROJECT_NBR"
 DATA_BUCKET="spark-perf-lab-data-$PROJECT_NBR"
 LOCATION="us-central1"
@@ -145,10 +145,9 @@ GPU handles 200 partitions efficiently due to GPU-accelerated shuffle.
 ### CPU Run
 
 ```
-
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
-S8S_SPARK_RUNTIME_VERSION="2.3"
+S8S_SPARK_RUNTIME_VERSION="3.0"
 CODE_BUCKET="spark-perf-lab-code-bucket-$PROJECT_NBR"
 DATA_BUCKET="spark-perf-lab-data-$PROJECT_NBR"
 LOCATION="us-central1"
@@ -170,10 +169,7 @@ spark.executor.cores=8,\
 spark.executor.memory=16g,\
 spark.driver.cores=4,\
 spark.driver.memory=8g,\
-spark.dataproc.driver.compute.tier=premium,\
-spark.dataproc.executor.compute.tier=premium,\
-spark.dataproc.driver.disk.tier=premium,\
-spark.dataproc.executor.disk.tier=premium,\
+dataproc.tier=premium, \
 spark.dataproc.driver.disk.size=375G,\
 spark.dataproc.executor.disk.size=375G,\
 spark.sql.autoBroadcastJoinThreshold=-1,\
@@ -188,6 +184,12 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
 
 24 minutes 27 seconds
 
+
+spark.dataproc.driver.compute.tier=premium,\
+spark.dataproc.executor.compute.tier=premium,\
+spark.dataproc.driver.disk.tier=premium,\
+spark.dataproc.executor.disk.tier=premium,\
+
 ### GPU Run
 
 ```
@@ -195,7 +197,7 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
 
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
-S8S_SPARK_RUNTIME_VERSION="2.3"
+S8S_SPARK_RUNTIME_VERSION="3.0"
 CODE_BUCKET="spark-perf-lab-code-bucket-$PROJECT_NBR"
 DATA_BUCKET="spark-perf-lab-data-$PROJECT_NBR"
 LOCATION="us-central1"
