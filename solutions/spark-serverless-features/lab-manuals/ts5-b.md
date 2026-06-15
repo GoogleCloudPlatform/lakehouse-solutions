@@ -151,7 +151,7 @@ gcloud dataproc batches submit pyspark \
     --region $LOCATION \
     --version $S8S_SPARK_RUNTIME_VERSION \
     --subnet $SUBNET_NAME \
-    --deps-bucket "gs://spark-perf-lab-code-bucket-$PROJECT_NBR \
+    --deps-bucket "gs://spark-perf-lab-code-bucket-$PROJECT_NBR" \
     --service-account $UMSA_FQN \
     --properties "\
 spark.dynamicAllocation.enabled=false,\
