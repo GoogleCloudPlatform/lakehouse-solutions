@@ -204,7 +204,7 @@ SUBNET_NAME="spark-perf-lab-snet"
 
 gcloud dataproc batches submit pyspark \
     "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
-    --batch "nvidia-abtest-cpu-baseline-$(date +%Y%m%d%H%M%S)" \
+    --batch "nvidia-abtest-gpu-$(date +%Y%m%d%H%M%S)" \
     --region $LOCATION \
     --version $S8S_SPARK_RUNTIME_VERSION \
     --subnet $SUBNET_NAME \
@@ -237,7 +237,6 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
     --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu" 
 ```
-
 
 ## Results
 
