@@ -41,7 +41,7 @@ tail -f spark-serverless-performance-tf-foundations.output
 
 
 
-### Core
+### L2.2. [Terraform] Provision the service account, networking dependencies, grant IAM permissions, upload code
 
 ```
 cd ~/lakehouse-solutions-build/solutions/performance-benchmarking/provisioning-automation/core-tf/terraform
