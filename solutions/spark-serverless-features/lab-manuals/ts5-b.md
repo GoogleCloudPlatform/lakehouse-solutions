@@ -158,7 +158,7 @@ GPU handles 200 partitions efficiently due to GPU-accelerated shuffle.
 
 ## Benchmark Commands
 
-### CPU run wuth 2 executors
+### CPU run with 2 executors and Managed Spark runtime version 3.0
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
@@ -171,7 +171,7 @@ SUBNET_NAME="spark-perf-lab-snet"
 
 gcloud dataproc batches submit pyspark \
     "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
-    --batch "nvidia-abtest-cpu-2ex-baseline-$(date +%Y%m%d%H%M%S)" \
+    --batch "nvidia-abtest-cpu-2ex-3-0-$(date +%Y%m%d%H%M%S)" \
     --region $LOCATION \
     --version $S8S_SPARK_RUNTIME_VERSION \
     --subnet $SUBNET_NAME \
@@ -194,10 +194,10 @@ spark.eventLog.enabled=true,\
 spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
-    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu_2ex" 
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu_2ex_3_0" 
 ```
 
-### CPU run wuth 4 executors
+### CPU run with 4 executors and Managed Spark runtime version 3.0
 
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
@@ -211,7 +211,7 @@ SUBNET_NAME="spark-perf-lab-snet"
 
 gcloud dataproc batches submit pyspark \
     "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
-    --batch "nvidia-abtest-cpu-4ex-baseline-$(date +%Y%m%d%H%M%S)" \
+    --batch "nvidia-abtest-cpu-4ex-3-0-baseline-$(date +%Y%m%d%H%M%S)" \
     --region $LOCATION \
     --version $S8S_SPARK_RUNTIME_VERSION \
     --subnet $SUBNET_NAME \
@@ -234,7 +234,7 @@ spark.eventLog.enabled=true,\
 spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
-    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu_4ex" 
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu_4ex_3_0" 
 ```
 
 <hr>
@@ -242,7 +242,6 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
 ### GPU run with 2 executors and Managed Spark runtime version 3.0
 
 ```
-
 
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
