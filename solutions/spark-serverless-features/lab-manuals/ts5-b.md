@@ -1,5 +1,17 @@
 # LAB: A/B Test Metric Aggregation - Dataproc Serverless Benchmark
 
+## L1: Overview
+
+This lab does benchmarking -  compares CPU vs GPU (NVIDIA L4) performance and cost for a production-scale A/B test metric aggregation pipeline on Managed Service for Apache Spark - serverless batches. It starts off with generating data, then benchmarking across versions of Managed Spark Serverless runtimes and with 2 and 4 executors, with and with GPUs and finally does a price-performance comparison.
+
+## Data
+
+- **Scale**: 6.5 billion rows (5 activity logs x 1.3B rows each + 200M assignment)
+- **Size**: 61.5 GiB on GCS (`gs://haozhu/data/ab_test/`)
+- **Tables**: 5 activity logs, 1 assignment table, 1 test config (200 rows)
+
+- 
+
 ## L1: Authenticate
 
 Run the following commands in Cloud Shell to authenticate and configure your active project:
@@ -39,6 +51,7 @@ You can
 tail -f spark-serverless-performance-tf-foundations.output
 ```
 
+<hr>
 
 
 ### L2.2. [Terraform] Provision the service account, networking dependencies, grant IAM permissions, upload code
@@ -84,18 +97,6 @@ tail -f ~/lakehouse-solutions/solutions/performance-benchmarking/provisioning-au
 
 
 
-
-## Overview
-
-This benchmark compares CPU vs GPU (NVIDIA L4) performance and cost for a
-production-scale A/B test metric aggregation pipeline on Google Cloud Dataproc
-Serverless.
-
-## Data
-
-- **Scale**: 6.5 billion rows (5 activity logs x 1.3B rows each + 200M assignment)
-- **Size**: 61.5 GiB on GCS (`gs://haozhu/data/ab_test/`)
-- **Tables**: 5 activity logs, 1 assignment table, 1 test config (200 rows)
 
 ### Data Generation
 
@@ -254,7 +255,7 @@ SUBNET_NAME="spark-perf-lab-snet"
 
 gcloud dataproc batches submit pyspark \
     "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
-    --batch "nvidia-abtest-gpu-2ex-$(date +%Y%m%d%H%M%S)" \
+    --batch "nvidia-abtest-gpu-2ex-3-0-$(date +%Y%m%d%H%M%S)" \
     --region $LOCATION \
     --version $S8S_SPARK_RUNTIME_VERSION \
     --subnet $SUBNET_NAME \
@@ -283,7 +284,7 @@ spark.eventLog.enabled=true,\
 spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
-    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu_2ex" 
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu_2ex_3_0" 
 ```
 
 <hr>
@@ -305,7 +306,7 @@ SUBNET_NAME="spark-perf-lab-snet"
 
 gcloud dataproc batches submit pyspark \
     "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
-    --batch "nvidia-abtest-gpu-4ex-$(date +%Y%m%d%H%M%S)" \
+    --batch "nvidia-abtest-gpu-4ex-3-0-$(date +%Y%m%d%H%M%S)" \
     --region $LOCATION \
     --version $S8S_SPARK_RUNTIME_VERSION \
     --subnet $SUBNET_NAME \
@@ -334,7 +335,7 @@ spark.eventLog.enabled=true,\
 spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
-    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu_4ex" 
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu_4ex_3_0" 
 ```
 
 
