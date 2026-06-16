@@ -1,13 +1,28 @@
-# A/B Test Metric Aggregation - Dataproc Serverless Benchmark
+# LAB: A/B Test Metric Aggregation - Dataproc Serverless Benchmark
+
+## L1: Authenticate
+
+Run the following commands in Cloud Shell to authenticate and configure your active project:
+
+1. Initialization:
+`gcloud init`
+
+2. Set the active project target:
+`gcloud config set project <YOUR_PROJECT_ID>`
+
+3. Set the quota project for ADC (Application Default Credentials):
+`gcloud auth application-default set-quota-project <YOUR_PROJECT_ID>`
+
+<hr>
 
 
-## Provisioning the environment
+## L2: Provision the environment
 
+We will use Terraform for infrastructure provisionig in two steps. In the first, we will provision the foundations - API enabling, organization policy related updates, in the second, we will provision service account, IAM permissions, buckets, load data and such. Follow along.
 
+### L2.1. [Terraform] Enable APIs and update organization policy
 
-
-## Foundational
-
+Run the below in Cloud Shell-
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 
@@ -19,7 +34,7 @@ terraform apply \
   -auto-approve >> spark-serverless-performance-tf-foundations.output
 ```
 
-
+You can 
 ```
 tail -f spark-serverless-performance-tf-foundations.output
 ```
