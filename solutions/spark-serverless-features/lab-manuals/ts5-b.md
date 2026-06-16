@@ -365,11 +365,12 @@ spark.executor.cores=8,\
 spark.executor.memory=16g,\
 spark.driver.cores=4,\
 spark.driver.memory=8g,\
-dataproc.tier=premium, \
-spark.dataproc.executor.disk.tier=premium, \
+spark.dataproc.driver.compute.tier=premium,\
+spark.dataproc.executor.compute.tier=premium,\
+spark.dataproc.driver.disk.tier=premium,\
+spark.dataproc.executor.disk.tier=premium,\
 spark.dataproc.driver.disk.size=375G,\
 spark.dataproc.executor.resource.accelerator.type=l4,\
-spark.dataproc.executor.storage.class=performance, \
 spark.plugins=com.nvidia.spark.SQLPlugin,\
 spark.rapids.sql.enabled=true,\
 spark.rapids.memory.pinnedPool.size=4G,\
@@ -382,6 +383,55 @@ spark.eventLog.enabled=true,\
 spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     -- \
     --data-dir "gs://$DATA_BUCKET/data/ab_test" \
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu_2ex_2_3" 
+```
+
+### GPU run with 4 executors and Managed Spark runtime version 2.3
+```
+
+PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
+PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
+S8S_SPARK_RUNTIME_VERSION="2.3"
+CODE_BUCKET="spark-perf-lab-code-bucket-$PROJECT_NBR"
+DATA_BUCKET="spark-perf-lab-data-$PROJECT_NBR"
+LOCATION="us-central1"
+UMSA_FQN="spark-perf-lab-umsa@$PROJECT_ID.iam.gserviceaccount.com"
+SUBNET_NAME="spark-perf-lab-snet"
+
+gcloud dataproc batches submit pyspark \
+    "gs://spark-perf-lab-code-bucket-$PROJECT_NBR/scripts/pyspark/gpu_optimization_run_benchmark.py" \
+    --batch "nvidia-abtest-gpu-4ex-2-3-$(date +%Y%m%d%H%M%S)" \
+    --region $LOCATION \
+    --version $S8S_SPARK_RUNTIME_VERSION \
+    --subnet $SUBNET_NAME \
+    --deps-bucket "gs://spark-perf-lab-code-bucket-$PROJECT_NBR" \
+    --service-account $UMSA_FQN \
+    --properties "\
+spark.dynamicAllocation.enabled=false,\
+spark.executor.instances=4,\
+spark.executor.cores=8,\
+spark.executor.memory=16g,\
+spark.driver.cores=4,\
+spark.driver.memory=8g,\
+spark.dataproc.driver.compute.tier=premium,\
+spark.dataproc.executor.compute.tier=premium,\
+spark.dataproc.driver.disk.tier=premium,\
+spark.dataproc.executor.disk.tier=premium,\
+spark.dataproc.driver.disk.size=375G,\
+spark.dataproc.executor.resource.accelerator.type=l4,\
+spark.plugins=com.nvidia.spark.SQLPlugin,\
+spark.rapids.sql.enabled=true,\
+spark.rapids.memory.pinnedPool.size=4G,\
+spark.rapids.sql.concurrentGpuTasks=3,\
+spark.task.resource.gpu.amount=0.125,\
+spark.sql.autoBroadcastJoinThreshold=-1,\
+spark.sql.shuffle.partitions=200,\
+spark.hadoop.mapreduce.fileoutputcommitter.algorithm.version=2,\
+spark.eventLog.enabled=true,\
+spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
+    -- \
+    --data-dir "gs://$DATA_BUCKET/data/ab_test" \
+    --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu_4ex_2_3" 
 ```
 
 ## Results
