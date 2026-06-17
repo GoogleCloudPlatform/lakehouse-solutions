@@ -158,7 +158,7 @@ GPU handles 200 partitions efficiently due to GPU-accelerated shuffle.
 
 ## Benchmark Commands
 
-### CPU run with 2 executors and Managed Spark runtime version 3.0
+### CPU run with 2 executors and Managed Spark Serverless runtime version 3.0
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
@@ -198,7 +198,7 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     --output-dir "gs://$DATA_BUCKET/data/ab_test_output_cpu_2ex_3_0" 
 ```
 
-### CPU run with 4 executors and Managed Spark runtime version 3.0
+### CPU run with 4 executors and Managed Spark Serverless runtime version 3.0
 
 ```
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
@@ -241,7 +241,7 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
 
 <hr>
 
-### GPU run with 2 executors and Managed Spark runtime version 3.0
+### GPU run with 2 executors and Managed Spark Serverless runtime version 3.0
 
 ```
 
@@ -292,11 +292,9 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
 <hr>
 
 
-### GPU run with 4 executors
+### GPU run with 4 executors and Managed Spark Serverless runtime version 3.0
 
 ```
-
-
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
 PROJECT_NBR=`gcloud projects describe $PROJECT_ID | grep projectNumber | cut -d':' -f2 |  tr -d "'" | xargs`
 S8S_SPARK_RUNTIME_VERSION="3.0"
@@ -342,7 +340,7 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
 ```
 
 
-### GPU run with 2 executors and Managed Spark runtime version 2.3
+### GPU run with 2 executors and Managed Spark Serverless runtime version 2.3
 ```
 
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
@@ -373,7 +371,7 @@ spark.dataproc.driver.compute.tier=premium,\
 spark.dataproc.executor.compute.tier=premium,\
 spark.dataproc.driver.disk.tier=premium,\
 spark.dataproc.executor.disk.tier=premium,\
-spark.dataproc.engine=standard, \
+spark.dataproc.engine=default,\
 spark.dataproc.driver.disk.size=375G,\
 spark.dataproc.executor.resource.accelerator.type=l4,\
 spark.plugins=com.nvidia.spark.SQLPlugin,\
@@ -391,7 +389,7 @@ spark.eventLog.dir=gs://$DATA_BUCKET/eventlog" \
     --output-dir "gs://$DATA_BUCKET/data/ab_test_output_gpu_2ex_2_3" 
 ```
 
-### GPU run with 4 executors and Managed Spark runtime version 2.3
+### GPU run with 4 executors and Managed Spark Serverless runtime version 2.3
 ```
 
 PROJECT_ID=`gcloud config list --format "value(core.project)" 2>/dev/null`
@@ -418,13 +416,13 @@ spark.executor.cores=8,\
 spark.executor.memory=16g,\
 spark.driver.cores=4,\
 spark.driver.memory=8g,\
+spark.dataproc.engine=default,\
+spark.dataproc.driver.disk.size=375G,\
+spark.dataproc.executor.resource.accelerator.type=l4,\
 spark.dataproc.driver.compute.tier=premium,\
 spark.dataproc.executor.compute.tier=premium,\
 spark.dataproc.driver.disk.tier=premium,\
 spark.dataproc.executor.disk.tier=premium,\
-spark.dataproc.engine=standard, \
-spark.dataproc.driver.disk.size=375G,\
-spark.dataproc.executor.resource.accelerator.type=l4,\
 spark.plugins=com.nvidia.spark.SQLPlugin,\
 spark.rapids.sql.enabled=true,\
 spark.rapids.memory.pinnedPool.size=4G,\
