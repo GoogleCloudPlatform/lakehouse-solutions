@@ -7,7 +7,7 @@ This lab does benchmarking -  compares CPU vs GPU (NVIDIA L4) performance and co
 ## Data
 
 - **Scale**: 6.5 billion rows (5 activity logs x 1.3B rows each + 200M assignment)
-- **Size**: 61.5 GiB on GCS (`gs://haozhu/data/ab_test/`)
+- **Size**: 61.5 GiB on GCS - generated in this lab
 - **Tables**: 5 activity logs, 1 assignment table, 1 test config (200 rows)
 
 - 
