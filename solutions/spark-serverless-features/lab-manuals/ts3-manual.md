@@ -738,7 +738,7 @@ There are fundamentally 3 out of the box [IAM roles](https://docs.cloud.google.c
 | -- | :--- | :--- | :--- | 
 | 1 | Lakehouse administrator | roles/biglake.admin | Provides full access to all lakehouse resources | 
 | 2 | Lakehouse editor | roles/biglake.editor | Provides read and write access to all lakehouse resources | 
-| 3 | Lakehouse viewer | roles/biglake.admin | Provides read-only access to all lakehouse resources |
+| 3 | Lakehouse viewer | roles/biglake.viewer | Provides read-only access to all lakehouse resources |
 
 <hr>
 
