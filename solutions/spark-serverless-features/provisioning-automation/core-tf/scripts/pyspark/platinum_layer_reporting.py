@@ -88,7 +88,7 @@ def main():
     # A mapping from report_name to the corresponding SQL and target table
     report_generation_jobs = {
         "REVENUE_BY_MONTH": (REVENUE_BY_MONTH_SQL, "p_rdm_rev_by_month"),
-        "AVERAGE_ORDER_VALUE": (AVERAGE_ORDER_VALUE_SQL, "p_rdm_averge_order_value"),
+        "AVERAGE_ORDER_VALUE": (AVERAGE_ORDER_VALUE_SQL, "p_rdm_average_order_value"),
         "TOP_TEN_PRODUCTS": (TOP_TEN_PRODUCTS_SQL, "p_rdm_top_ten_products_by_revenue"),
         "CUSTOMER_SEGMENTATION": (CUSTOMER_SEGMENTATION_SQL, "p_rdm_customer_segmentation_by_age")
     }

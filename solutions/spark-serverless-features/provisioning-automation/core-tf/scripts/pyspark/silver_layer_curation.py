@@ -139,7 +139,7 @@ def curate_orders(spark: SparkSession, lakehouse_bucket_name: str, data_entity_n
     
     # Use Broadcast Hint and move logic into SQL for the optimizer
     query = """
-    SELECT /*+ BROADCAST(p) */
+    SELECT /*+ BROADCAST(o) */
         DISTINCT
         o.order_id,
         CAST(o.order_dt AS DATE) as order_dt,
