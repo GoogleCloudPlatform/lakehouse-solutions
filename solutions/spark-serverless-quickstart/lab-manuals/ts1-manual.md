@@ -292,7 +292,7 @@ CODE_AND_DATA_BUCKET="qs-s8s-data_and_code_bucket-${PROJECT_NBR}"
 
 Run this command in Cloud Shell-
 ```
-gsutil ls -r "gs://$CODE_AND_DATA_BUCKET/scripts"
+gcloud storage ls -r "gs://$CODE_AND_DATA_BUCKET/scripts"
 ```
 
 ![README](../images/s8s-qs-351.png)   
@@ -304,7 +304,7 @@ gsutil ls -r "gs://$CODE_AND_DATA_BUCKET/scripts"
 
 Run this command in Cloud Shell-
 ```
-gsutil ls -r "gs://$CODE_AND_DATA_BUCKET/datasets"
+gcloud storage ls -r "gs://$CODE_AND_DATA_BUCKET/datasets"
 ```
 
 ![README](../images/s8s-qs-352.png)   
@@ -582,7 +582,7 @@ root
 #### 3.6.1.7. Review the results in Cloud Storage
  
  ```
- gsutil ls -r gs://$CODE_AND_DATA_BUCKET/output_data/customer_augmented
+ gcloud storage ls -r gs://$CODE_AND_DATA_BUCKET/output_data/customer_augmented
 
  ```
  
@@ -827,7 +827,7 @@ only showing top 20 rows
 
 #### 6.2.6. List the results in the GCS bucket
 ```
-gsutil ls -r gs://$CODE_AND_DATA_BUCKET/output_data/telco_performance_augmented
+gcloud storage ls -r gs://$CODE_AND_DATA_BUCKET/output_data/telco_performance_augmented
 ```
 The author's output-
 ```
@@ -963,7 +963,7 @@ Note the defect count which is a netric derived that indicates issues with the c
 
 #### 6.3.5. List the results in the GCS bucket
 ```
-gsutil ls -r gs://$CODE_AND_DATA_BUCKET/output_data/kpis_by_customer
+gcloud storage ls -r gs://$CODE_AND_DATA_BUCKET/output_data/kpis_by_customer
 ```
 The author's output-
 ```
@@ -1162,7 +1162,7 @@ A metric has been added called "Maintenance_Required" to reflect defects beyond 
 
 #### 6.4.5. List the results in the GCS bucket-
 ```
-gsutil ls -r gs://$CODE_AND_DATA_BUCKET/output_data/kpis_by_cell_tower
+gcloud storage ls -r gs://$CODE_AND_DATA_BUCKET/output_data/kpis_by_cell_tower
 ```
 The author's output-
 ```
