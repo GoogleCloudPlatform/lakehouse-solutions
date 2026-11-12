@@ -79,37 +79,49 @@ slice2DF2=slice2DF1.withColumn('service_stability_data_calls',slice2DF1.avg_peak
 slice2DF3=slice2DF2.withColumn('Incomplete_voice_calls',slice2DF2.avg_plcd_vce_Mean -slice2DF2.avg_comp_vce_Mean )
 slice2DF4=slice2DF3.withColumn('Incomplete_data_calls',slice2DF3.avg_plcd_dat_Mean -slice2DF3.avg_comp_dat_Mean )
 
-slice2DF5=slice2DF4.withColumn('PRBUsageUL_Thrsld',when(col("avg_PRBUsageUL") < str(slice2DF4.select(avg("avg_PRBUsageUL")).collect()[0][0]), 0)             .when(col("avg_PRBUsageUL") >str(slice2DF4.select(avg("avg_PRBUsageUL")).collect()[0][0]),1) )
-slice2DF6=slice2DF5.withColumn('PRBUsageDL_Thrsld', when(col("avg_PRBUsageDL") < str(slice2DF4.select(avg("avg_PRBUsageDL")).collect()[0][0]), 0)              .when(col("avg_PRBUsageDL") > str(slice2DF4.select(avg("avg_PRBUsageDL")).collect()[0][0]), 1))
-slice2DF7=slice2DF6.withColumn('meanThr_DL_Thrsld', when(col("avg_meanThr_DL") < str(slice2DF4.select(avg("avg_meanThr_DL")).collect()[0][0]), 1)              .when(col("avg_meanThr_DL") > str(slice2DF4.select(avg("avg_meanThr_DL")).collect()[0][0]), 0) )
-slice2DF8=slice2DF7.withColumn('meanThr_UL_Thrsld', when(col("avg_meanThr_UL") < str(slice2DF4.select(avg("avg_meanThr_UL")).collect()[0][0]), 1)              .when(col("avg_meanThr_UL") > str(slice2DF4.select(avg("avg_meanThr_UL")).collect()[0][0]), 0) )
-slice2DF9=slice2DF8.withColumn('maxThr_DL_Thrsld', when(col("avg_maxThr_DL") < str(slice2DF4.select(avg("avg_maxThr_DL")).collect()[0][0]), 0)              .when(col("avg_maxThr_DL") > str(slice2DF4.select(avg("avg_maxThr_DL")).collect()[0][0]), 1))
-slice2DF10=slice2DF9.withColumn('maxThr_UL_Thrsld', when(col("avg_maxThr_UL") <str(slice2DF4.select(avg("avg_maxThr_UL")).collect()[0][0]), 0)              .when(col("avg_maxThr_UL") > str(slice2DF4.select(avg("avg_maxThr_UL")).collect()[0][0]), 1))
-slice2DF11=slice2DF10.withColumn('meanUE_DL_Thrsld', when(col("avg_meanUE_DL") < str(slice2DF4.select(avg("avg_meanUE_DL")).collect()[0][0]), 0)             .when(col("avg_meanUE_DL") > str(slice2DF4.select(avg("avg_meanUE_DL")).collect()[0][0]), 1))
-slice2DF12=slice2DF11.withColumn('meanUE_UL_Thrsld', when(col("avg_meanUE_UL") < str(slice2DF4.select(avg("avg_meanUE_UL")).collect()[0][0]), 0)              .when(col("avg_meanUE_UL") >str(slice2DF4.select(avg("avg_meanUE_UL")).collect()[0][0]), 1) )
-slice2DF13=slice2DF12.withColumn('maxUE_DL_Thrsld',when(col("avg_maxUE_DL") < str(slice2DF4.select(avg("avg_maxUE_DL")).collect()[0][0]), 0)              .when(col("avg_maxUE_DL") > str(slice2DF4.select(avg("avg_maxUE_DL")).collect()[0][0]), 1))
-slice2DF14=slice2DF13.withColumn('maxUE_UL_Thrsld', when(col("avg_maxUE_UL") < str(slice2DF4.select(avg("avg_maxUE_UL")).collect()[0][0]), 0)              .when(col("avg_maxUE_UL") > str(slice2DF4.select(avg("avg_maxUE_UL")).collect()[0][0]), 1) )
-slice2DF15=slice2DF14.withColumn('maxUE_UL_DL_Thrsld', when(col("avg_maxUE_UL_DL") < str(slice2DF4.select(avg("avg_maxUE_UL_DL")).collect()[0][0]), 0)              .when(col("avg_maxUE_UL_DL") > str(slice2DF4.select(avg("avg_maxUE_UL_DL")).collect()[0][0]), 1) )
-slice2DF16=slice2DF15.withColumn('roam_Mean_Thrsld', when(col("avg_roam_Mean") < str(slice2DF4.select(avg("avg_roam_Mean")).collect()[0][0]), 1)              .when(col("avg_roam_Mean") > str(slice2DF4.select(avg("avg_roam_Mean")).collect()[0][0]), 0) )
-slice2DF17=slice2DF16.withColumn('change_mouL_Thrsld', when(col("avg_change_mou") < str(slice2DF4.select(avg("avg_change_mou")).collect()[0][0]), 1)              .when(col("avg_change_mou") > str(slice2DF4.select(avg("avg_change_mou")).collect()[0][0]), 0) )
-slice2DF18=slice2DF17.withColumn('drop_vce_Mean_Thrsld', when(col("avg_drop_vce_Mean") < str(slice2DF4.select(avg("avg_drop_vce_Mean")).collect()[0][0]), 0)              .when(col("avg_drop_vce_Mean") > str(slice2DF4.select(avg("avg_drop_vce_Mean")).collect()[0][0]), 1))
-slice2DF19=slice2DF18.withColumn('drop_dat_Mean_Thrsld', when(col("avg_drop_dat_Mean") < str(slice2DF4.select(avg("avg_drop_dat_Mean")).collect()[0][0]), 0)              .when(col("avg_drop_dat_Mean") > str(slice2DF4.select(avg("avg_drop_dat_Mean")).collect()[0][0]), 1) )
-slice2DF20=slice2DF19.withColumn('blck_vce_Mean_Thrsld', when(col("avg_blck_vce_Mean") < str(slice2DF4.select(avg("avg_blck_vce_Mean")).collect()[0][0]), 0)              .when(col("avg_blck_vce_Mean") > str(slice2DF4.select(avg("avg_blck_vce_Mean")).collect()[0][0]), 1) )
-slice2DF21=slice2DF20.withColumn('blck_dat_Mean_Thrsld', when(col("avg_blck_dat_Mean") < str(slice2DF4.select(avg("avg_blck_dat_Mean")).collect()[0][0]), 0)              .when(col("avg_blck_dat_Mean") > str(slice2DF4.select(avg("avg_blck_dat_Mean")).collect()[0][0]), 1) )
-slice2DF22=slice2DF21.withColumn('peak_vce_Mean_Thrsld', when(col("avg_peak_vce_Mean") < str(slice2DF4.select(avg("avg_peak_vce_Mean")).collect()[0][0]), 1)              .when(col("avg_peak_vce_Mean") > str(slice2DF4.select(avg("avg_peak_vce_Mean")).collect()[0][0]), 0) )
-slice2DF23=slice2DF22.withColumn('peak_dat_Mean_Thrsld', when(col("avg_peak_dat_Mean") < str(slice2DF4.select(avg("avg_peak_dat_Mean")).collect()[0][0]), 1)              .when(col("avg_peak_dat_Mean") > str(slice2DF4.select(avg("avg_peak_dat_Mean")).collect()[0][0]), 0))
-slice2DF24=slice2DF23.withColumn('opk_vce_Mean_Thrsld', when(col("avg_opk_vce_Mean") < str(slice2DF4.select(avg("avg_opk_vce_Mean")).collect()[0][0]), 1)              .when(col("avg_opk_vce_Mean") > str(slice2DF4.select(avg("avg_opk_vce_Mean")).collect()[0][0]), 0) )
-slice2DF25=slice2DF24.withColumn('opk_dat_Mean_Thrsld', when(col("avg_opk_dat_Mean") < str(slice2DF4.select(avg("avg_opk_dat_Mean")).collect()[0][0]), 1)              .when(col("avg_opk_dat_Mean") > str(slice2DF4.select(avg("avg_opk_dat_Mean")).collect()[0][0]), 0))
-slice2DF26=slice2DF25.withColumn('drop_blk_Mean_Thrsld',  when(col("avg_drop_blk_Mean") < str(slice2DF4.select(avg("avg_drop_blk_Mean")).collect()[0][0]), 1)              .when(col("avg_drop_blk_Mean") > str(slice2DF4.select(avg("avg_drop_blk_Mean")).collect()[0][0]), 0) )
-slice2DF27=slice2DF26.withColumn('callfwdv_Mean_Thrsld', when(col("avg_callfwdv_Mean") < str(slice2DF4.select(avg("avg_callfwdv_Mean")).collect()[0][0]), 1)              .when(col("avg_callfwdv_Mean") > str(slice2DF4.select(avg("avg_callfwdv_Mean")).collect()[0][0]), 0))
-slice2DF28=slice2DF27.withColumn('service_stability_voice_calls_Thrsld', when(col("service_stability_voice_calls")> str(slice2DF4.select(avg("service_stability_voice_calls")).collect()[0][0]) , 0)              .when(col("service_stability_voice_calls")< str(slice2DF4.select(avg("service_stability_voice_calls")).collect()[0][0]), 1))
-slice2DF29=slice2DF28.withColumn('service_stability_data_calls_Thrsld', when(col("service_stability_data_calls")> str(slice2DF4.select(avg("service_stability_data_calls")).collect()[0][0]), 0)              .when(col("service_stability_data_calls")< str(slice2DF4.select(avg("service_stability_data_calls")).collect()[0][0]), 1))
-slice2DF29.show(3,truncate=False)
+# Replace nulls with 0 across columns
+slice2DF5 = slice2DF4.fillna(value=0)
+
+# Calculate global averages ONE TIME to avoid redundant Spark jobs
+metrics_to_avg = [
+    "avg_PRBUsageUL", "avg_PRBUsageDL", "avg_meanThr_DL", "avg_meanThr_UL",
+    "avg_maxThr_DL", "avg_maxThr_UL", "avg_meanUE_DL", "avg_meanUE_UL",
+    "avg_maxUE_DL", "avg_maxUE_UL", "avg_maxUE_UL_DL",
+    "avg_roam_Mean", "avg_change_mou", "avg_drop_vce_Mean", "avg_drop_dat_Mean",
+    "avg_blck_vce_Mean", "avg_blck_dat_Mean", "avg_peak_vce_Mean", "avg_peak_dat_Mean",
+    "avg_opk_vce_Mean", "avg_opk_dat_Mean", "avg_drop_blk_Mean", "avg_callfwdv_Mean",
+    "service_stability_voice_calls", "service_stability_data_calls"
+]
+
+global_avgs_row = slice2DF5.select([F.avg(c).alias(c) for c in metrics_to_avg]).collect()[0].asDict()
+
+greater_is_one = {
+    "avg_PRBUsageUL", "avg_PRBUsageDL", "avg_maxThr_DL", "avg_maxThr_UL",
+    "avg_meanUE_DL", "avg_meanUE_UL", "avg_maxUE_DL", "avg_maxUE_UL",
+    "avg_maxUE_UL_DL", "avg_drop_vce_Mean", "avg_drop_dat_Mean",
+    "avg_blck_vce_Mean", "avg_blck_dat_Mean"
+}
+
+def threshold_col_name(c: str) -> str:
+    if c == "avg_change_mou":
+        return "change_mouL_Thrsld"
+    if c.startswith("avg_"):
+        return c[4:] + "_Thrsld"
+    return c + "_Thrsld"
+
+threshold_cols = []
+for c in metrics_to_avg:
+    out_col = threshold_col_name(c)
+    if c in greater_is_one:
+        threshold_cols.append(F.when(F.col(c) > F.lit(global_avgs_row[c]), 1).otherwise(0).alias(out_col))
+    else:
+        threshold_cols.append(F.when(F.col(c) < F.lit(global_avgs_row[c]), 1).otherwise(0).alias(out_col))
+
+# Add all threshold columns in one select and replace nulls with 0
+slice2DF30 = slice2DF5.select("*", *threshold_cols).fillna(value=0)
+slice2DF30.show(3, truncate=False)
 
 # Based on the performance check verifying whether the Maintainence for the cell tower required or not
-# ...Replace nulls
-slice2DF30=slice2DF29.fillna(value =0)
-
 # ...Calculate defect count
 slice2DF31 = slice2DF30.withColumn("defect_count",col("PRBUsageUL_Thrsld")+col("PRBUsageDL_Thrsld")+col("meanThr_DL_Thrsld")+col("meanThr_UL_Thrsld")+col("maxThr_DL_Thrsld")+col("maxThr_UL_Thrsld")+col("meanUE_DL_Thrsld")+col("meanUE_UL_Thrsld")+col("maxUE_DL_Thrsld")+col("maxUE_UL_Thrsld")+col("maxUE_UL_DL_Thrsld")+col("roam_Mean_Thrsld")+col("change_mouL_Thrsld")+col("drop_vce_Mean_Thrsld")+col("drop_dat_Mean_Thrsld")+col("blck_vce_Mean_Thrsld")+col("blck_dat_Mean_Thrsld")+col("peak_vce_Mean_Thrsld")+col("peak_dat_Mean_Thrsld")+col("opk_vce_Mean_Thrsld")+col("opk_dat_Mean_Thrsld")+col("drop_blk_Mean_Thrsld")+col("callfwdv_Mean_Thrsld")+col("service_stability_voice_calls_Thrsld")+col("service_stability_data_calls_Thrsld"))
 
