@@ -183,7 +183,7 @@ def generate_batch_config(layer: str, entity_name: str):
             },
         }
     else:
-        raise ValueError(f"Invalid layer {layer} or data entity {data_entity_name}")
+        raise ValueError(f"Invalid layer {layer} or data entity {entity_name}")
     
 bronze_data_entities = [
     "customers",
