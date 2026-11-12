@@ -112,6 +112,8 @@ def curate_products(spark: SparkSession, stage_bucket_name: str, lakehouse_bucke
     # High-parallelism across Spark executors for file copy from staging to silver layer
     # We use repartition to ensure we have enough 'worker threads' hitting GCS.
     sync_job = df_files_to_copy.repartition(200).mapInPandas(parallel_copy_pdfs, result_schema)
+    total_batches = sync_job.count()
+    logging.info(f"Sync complete. Successfully processed {total_batches} parallel batches.")
 
 
 def curate_orders(spark: SparkSession, lakehouse_bucket_name: str, data_entity_name: str):
