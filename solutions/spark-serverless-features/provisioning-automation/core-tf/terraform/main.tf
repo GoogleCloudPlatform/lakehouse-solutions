@@ -403,9 +403,9 @@ locals {
       find "$TMP_DIR_BASE" -name ".DS_Store" -delete
 
       # Upload to GCS
-      gsutil -m cp -r "$TMP_FROYO_DATA_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-data/
-      gsutil -m cp -r "$TMP_FROYO_RECIPES_PDFS_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-recipe-pdfs/
-      gsutil -m cp -r "$TMP_FROYO_INGREDIENTS_PDFS_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-recipe-ingredients-pdfs/
+      gcloud storage cp -r "$TMP_FROYO_DATA_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-data/
+      gcloud storage cp -r "$TMP_FROYO_RECIPES_PDFS_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-recipe-pdfs/
+      gcloud storage cp -r "$TMP_FROYO_INGREDIENTS_PDFS_DIR"/* gs://${local.lakehouse_staging_bucket}/froyo-recipe-ingredients-pdfs/
 
       rm -rf "$TMP_DIR_BASE"
 EOT
